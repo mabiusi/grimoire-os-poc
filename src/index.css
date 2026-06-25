@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+  /* Es una consola, no una web: nada de selección de texto con el ratón. */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: #000;
+  overflow: hidden;
+  overscroll-behavior: none; /* evita el "bounce" al tocar el gamepad en móvil */
+  font-family: 'VT323', monospace;
+  /* Apariencia "dura" sin antialias para reforzar lo pixelado. */
+  -webkit-font-smoothing: none;
+  text-rendering: optimizeSpeed;
+}
+
+/* Modo noche: filtro frío y atenuado sobre la interfaz del OS (Select). */
+.theme-night {
+  filter: brightness(0.82) saturate(0.8) hue-rotate(200deg) contrast(1.05);
+}
+
+/* ----------------------------------------------------------------------
+   Animaciones del firmware
+---------------------------------------------------------------------- */
+@keyframes gr-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+@keyframes gr-softpulse {
+  0%, 100% { opacity: 1; transform: translateX(0); }
+  50% { opacity: 0.5; transform: translateX(-2px); }
+}
+@keyframes gr-shake {
+  0%, 100% { transform: translate(0, 0) rotate(0); }
+  25% { transform: translate(-2px, 1px) rotate(-1deg); }
+  50% { transform: translate(2px, -2px) rotate(1deg); }
+  75% { transform: translate(-1px, 2px) rotate(0); }
+}
+@keyframes gr-flicker {
+  0%, 100% { opacity: 0.97; }
+  7% { opacity: 0.85; }
+  10% { opacity: 0.95; }
+  52% { opacity: 1; }
+}
+@keyframes gr-scan {
+  from { transform: translateY(-110%); }
+  to { transform: translateY(110%); }
+}
+@keyframes gr-popin {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.animate-blink { animation: gr-blink 1s steps(1, end) infinite; }
+.animate-softpulse { animation: gr-softpulse 0.9s ease-in-out infinite; }
+.animate-shake { animation: gr-shake 0.09s linear infinite; }
+.animate-popin { animation: gr-popin 0.18s steps(4, end); }
+
+/* ----------------------------------------------------------------------
+   Efectos CRT del marco de la consola
+---------------------------------------------------------------------- */
+@layer utilities {
+  .text-pixel-shadow {
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.65);
+  }
+
+  /* Líneas de barrido del tubo de rayos catódicos. */
+  .scanlines::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0px,
+      rgba(0, 0, 0, 0) 2px,
+      rgba(0, 0, 0, 0.22) 3px,
+      rgba(0, 0, 0, 0.22) 3px
+    );
+  }
+
+  /* Viñeta + leve parpadeo del fósforo. */
+  .crt {
+    box-shadow:
+      inset 0 0 60px 12px rgba(0, 0, 0, 0.75),
+      inset 0 0 10px 2px rgba(0, 0, 0, 0.6);
+    animation: gr-flicker 6s infinite;
+  }
+
+  /* Barra de luz que recorre la pantalla lentamente. */
+  .crt-glow::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 51;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.05),
+      rgba(255, 255, 255, 0)
+    );
+    height: 40%;
+    animation: gr-scan 7s linear infinite;
+  }
+}

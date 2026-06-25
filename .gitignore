@@ -1,0 +1,11 @@
+node_modules
+dist
+dist-ssr
+dev-dist
+*.local
+.DS_Store
+.vite
+.vercel
+
+# Configuración local/personal de Claude Code (no publicar)
+.claude/settings.local.json
