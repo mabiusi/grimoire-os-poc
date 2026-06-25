@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Frame from '../components/Frame.jsx';
 import Cursor from '../components/Cursor.jsx';
+import SpellTracker from '../components/SpellTracker.jsx';
 import CharacterCreator from './CharacterCreator.jsx';
 import { useSystem } from '../context/SystemContext.jsx';
 import { useCharacters } from '../context/CharacterContext.jsx';
@@ -18,7 +19,7 @@ const ACCENT = {
   parchment: 'text-ink',
 };
 
-const TABS = ['Stats', 'Inventario', 'Hechizos'];
+const TABS = ['Stats', 'Inventario', 'Magia'];
 const SCROLL_STEP = 64;
 
 export default function CharacterSheets() {
@@ -242,7 +243,7 @@ function SheetViewer({ entry, onBack }) {
           >
             {tab === 0 && <StatsTab c={c} />}
             {tab === 1 && <InventoryTab c={c} />}
-            {tab === 2 && <SpellsTab c={c} />}
+            {tab === 2 && <MagiaTab c={c} />}
             <div className="h-2" />
           </div>
 
@@ -361,31 +362,23 @@ function InventoryTab({ c }) {
   );
 }
 
-function SpellsTab({ c }) {
-  if (!c.spells || c.spells.length === 0) {
+function MagiaTab({ c }) {
+  // Estructura nueva c.magic; si no, sintetiza desde c.spells (CoC); si no, vacío.
+  const magic =
+    c.magic ||
+    (c.spells && c.spells.length
+      ? { cantrips: [], spells: c.spells.map(([name]) => ({ name, level: 1 })), slots: {} }
+      : null);
+
+  if (!magic) {
     return (
-      <Section label="Hechizos">
+      <Section label="Magia">
         <div className="rounded border-2 border-dashed border-bronze/50 p-4 text-center font-vt text-lg text-bronze">
           ✦ Sin conjuros ✦
-          <p className="mt-2 text-base leading-snug">{c.spellsNote}</p>
+          <p className="mt-2 text-base leading-snug">{c.spellsNote || 'Esta clase no lanza conjuros.'}</p>
         </div>
       </Section>
     );
   }
-  return (
-    <Section label="Hechizos">
-      <p className="mb-2 font-vt text-base italic leading-snug text-bronze">{c.spellsNote}</p>
-      <ul className="flex flex-col gap-2">
-        {c.spells.map(([name, cost, desc]) => (
-          <li key={name} className="rounded border border-bronze/50 bg-parchmentDark/40 px-3 py-1.5">
-            <div className="flex items-center justify-between font-vt text-lg">
-              <span className="font-semibold text-arcane">{name}</span>
-              <span className="font-press text-[8px] text-blood">{cost}</span>
-            </div>
-            <p className="font-vt text-base leading-snug text-ink/80">{desc}</p>
-          </li>
-        ))}
-      </ul>
-    </Section>
-  );
+  return <SpellTracker magic={magic} />;
 }
