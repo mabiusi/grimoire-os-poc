@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import Frame from '../components/Frame.jsx';
 import Cursor from '../components/Cursor.jsx';
+import CharacterCreator from './CharacterCreator.jsx';
 import { useSystem } from '../context/SystemContext.jsx';
+import { useCharacters } from '../context/CharacterContext.jsx';
 import { useGamepad } from '../hooks/useGamepad.js';
 import { sfx } from '../lib/sfx.js';
-import { SYSTEMS } from '../data/characters.js';
-import { wrapIndex } from '../lib/utils.js';
+import { clamp, wrapIndex } from '../lib/utils.js';
 
 // Mapa accent -> clase de color (literal, para que Tailwind no lo purgue).
 const ACCENT = {
@@ -22,48 +23,73 @@ const SCROLL_STEP = 64;
 
 export default function CharacterSheets() {
   const { goBack } = useSystem();
-  const [phase, setPhase] = useState('select'); // 'select' | 'sheet'
-  const [sysIndex, setSysIndex] = useState(0);
+  const { roster, addCharacter } = useCharacters();
+  const [phase, setPhase] = useState('roster'); // 'roster' | 'view' | 'create'
+  const [viewEntry, setViewEntry] = useState(null);
 
-  if (phase === 'select') {
+  if (phase === 'view' && viewEntry) {
+    return <SheetViewer entry={viewEntry} onBack={() => { sfx.back(); setPhase('roster'); }} />;
+  }
+
+  if (phase === 'create') {
     return (
-      <SystemSelect
-        index={sysIndex}
-        setIndex={setSysIndex}
-        onOpen={() => {
-          sfx.open();
-          setPhase('sheet');
-        }}
-        onBack={() => {
+      <CharacterCreator
+        onCancel={() => {
           sfx.back();
-          goBack();
+          setPhase('roster');
+        }}
+        onComplete={(entry) => {
+          addCharacter(entry);
+          setViewEntry(entry); // mostramos la ficha recién creada
+          setPhase('view');
         }}
       />
     );
   }
 
   return (
-    <SheetViewer
-      system={SYSTEMS[sysIndex]}
+    <Roster
+      roster={roster}
+      onOpen={(entry) => {
+        sfx.open();
+        setViewEntry(entry);
+        setPhase('view');
+      }}
+      onCreate={() => {
+        sfx.open();
+        setPhase('create');
+      }}
       onBack={() => {
         sfx.back();
-        setPhase('select');
+        goBack();
       }}
     />
   );
 }
 
 /* --------------------------------------------------------------------- */
-function SystemSelect({ index, setIndex, onOpen, onBack }) {
-  const move = (next) => {
+function Roster({ roster, onOpen, onCreate, onBack }) {
+  // El último índice es la opción "Crear nuevo personaje".
+  const total = roster.length + 1;
+  const [sel, setSel] = useState(0);
+  const activeRef = useRef(null);
+
+  const index = clamp(sel, 0, total - 1);
+  const onCreateRow = index === roster.length;
+
+  const move = (n) => {
     sfx.move();
-    setIndex(next);
+    setSel(n);
   };
 
+  useEffect(() => {
+    activeRef.current?.scrollIntoView({ block: 'nearest' });
+  }, [index]);
+
   useGamepad({
-    onUp: () => move(wrapIndex(index - 1, SYSTEMS.length)),
-    onDown: () => move(wrapIndex(index + 1, SYSTEMS.length)),
-    onA: onOpen,
+    onUp: () => move(wrapIndex(index - 1, total)),
+    onDown: () => move(wrapIndex(index + 1, total)),
+    onA: () => (onCreateRow ? onCreate() : onOpen(roster[index])),
     onB: onBack,
   });
 
@@ -77,30 +103,48 @@ function SystemSelect({ index, setIndex, onOpen, onBack }) {
         ['B', 'Atrás'],
       ]}
     >
-      <div className="flex h-full flex-col p-4">
-        <p className="mb-3 font-press text-[9px] text-gold/80">SELECCIONA UN SISTEMA</p>
-        <div className="flex flex-1 flex-col gap-3">
-          {SYSTEMS.map((sys, i) => {
+      <div className="flex h-full flex-col p-3">
+        <p className="mb-2 font-press text-[9px] text-gold/80">
+          TUS PERSONAJES <span className="text-gold/50">({roster.length})</span>
+        </p>
+        <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {roster.map((entry, i) => {
             const active = i === index;
             return (
               <div
-                key={sys.id}
+                key={entry.id}
+                ref={active ? activeRef : null}
                 className={[
-                  'flex items-center gap-3 rounded border-2 px-3 py-3 transition-colors',
+                  'flex items-center gap-3 rounded border-2 px-3 py-2 transition-colors',
                   active
                     ? 'border-goldLight bg-gold text-ink shadow-bevel'
                     : 'border-bronze/60 bg-stoneDark text-parchment/80',
                 ].join(' ')}
               >
                 <Cursor visible={active} className={active ? 'text-ink' : ''} />
-                <span className="text-3xl">{sys.icon}</span>
+                <span className="text-2xl">{entry.icon}</span>
                 <div className="leading-tight">
-                  <div className="font-press text-[11px]">{sys.name}</div>
-                  <div className="font-vt text-lg opacity-80">{sys.subtitle}</div>
+                  <div className="font-vt text-xl">{entry.character.name}</div>
+                  <div className="font-press text-[7px] opacity-70">{entry.name}</div>
                 </div>
               </div>
             );
           })}
+
+          {/* Fila "Crear nuevo" */}
+          <div
+            ref={onCreateRow ? activeRef : null}
+            className={[
+              'flex items-center gap-3 rounded border-2 border-dashed px-3 py-2',
+              onCreateRow
+                ? 'border-goldLight bg-gold text-ink shadow-bevel'
+                : 'border-moss/60 text-moss',
+            ].join(' ')}
+          >
+            <Cursor visible={onCreateRow} className={onCreateRow ? 'text-ink' : ''} />
+            <span className="text-2xl">＋</span>
+            <div className="font-press text-[10px]">Crear nuevo personaje</div>
+          </div>
         </div>
       </div>
     </Frame>
@@ -108,11 +152,11 @@ function SystemSelect({ index, setIndex, onOpen, onBack }) {
 }
 
 /* --------------------------------------------------------------------- */
-function SheetViewer({ system, onBack }) {
+function SheetViewer({ entry, onBack }) {
   const scrollRef = useRef(null);
   const [tab, setTab] = useState(0);
   const [edges, setEdges] = useState({ top: true, bottom: false });
-  const c = system.character;
+  const c = entry.character;
 
   const updateEdges = () => {
     const el = scrollRef.current;
@@ -153,8 +197,8 @@ function SheetViewer({ system, onBack }) {
 
   return (
     <Frame
-      title={system.name.toUpperCase()}
-      icon={system.icon}
+      title={entry.name.toUpperCase()}
+      icon={entry.icon}
       hints={[
         ['L/R', 'Pestañas'],
         ['↑↓', 'Scroll'],

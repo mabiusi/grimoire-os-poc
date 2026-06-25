@@ -3,6 +3,7 @@ import Device from './components/Device.jsx';
 import VirtualGamepad from './components/VirtualGamepad.jsx';
 import GlobalControls from './components/GlobalControls.jsx';
 import { InputProvider } from './context/InputContext.jsx';
+import { CharacterProvider } from './context/CharacterContext.jsx';
 import { SCREENS, SystemProvider, useSystem } from './context/SystemContext.jsx';
 
 import BootSequence from './screens/BootSequence.jsx';
@@ -94,7 +95,9 @@ export default function App() {
   return (
     <SystemProvider>
       <InputProvider>
-        <Shell />
+        <CharacterProvider>
+          <Shell />
+        </CharacterProvider>
       </InputProvider>
     </SystemProvider>
   );

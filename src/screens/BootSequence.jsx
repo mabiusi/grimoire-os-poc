@@ -20,6 +20,8 @@ const LINES = [
 ];
 
 const LINE_DELAY = 180; // ms entre líneas
+const LOGO_DELAY = 600; // pausa tras las líneas antes de mostrar el logo
+const LOGO_HOLD = 4200; // el logo permanece en pantalla para disfrutar la estética
 
 export default function BootSequence() {
   const { reset } = useSystem();
@@ -44,8 +46,10 @@ export default function BootSequence() {
     }
     // Tras las líneas, muestra el logo y luego entra al launcher.
     const afterLines = LINES.length * LINE_DELAY;
-    timers.current.push(setTimeout(() => setPhase('logo'), afterLines + 350));
-    timers.current.push(setTimeout(() => reset(SCREENS.LAUNCHER), afterLines + 1600));
+    timers.current.push(setTimeout(() => setPhase('logo'), afterLines + LOGO_DELAY));
+    timers.current.push(
+      setTimeout(() => reset(SCREENS.LAUNCHER), afterLines + LOGO_DELAY + LOGO_HOLD)
+    );
 
     return () => timers.current.forEach(clearTimeout);
   }, [reset]);
