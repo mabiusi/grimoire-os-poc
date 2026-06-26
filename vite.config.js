@@ -12,7 +12,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       // El Service Worker se registra manualmente en src/main.jsx.
       injectRegister: false,
-      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
+      // Íconos + la base de conocimiento NORMALIZADA (sólo clean_*.json, ~0.6 MB),
+      // para funcionar offline. El dump crudo de 5etools nunca se precachea.
+      includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'data/clean_*.json'],
       manifest: {
         name: 'Grimoire OS',
         short_name: 'Grimoire',

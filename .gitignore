@@ -9,3 +9,4 @@ dev-dist
 
 # Configuración local/personal de Claude Code (no publicar)
 .claude/settings.local.json
+raw_data/

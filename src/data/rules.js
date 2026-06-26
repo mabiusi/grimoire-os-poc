@@ -1,4 +1,4 @@
-// Páginas del Grimorio de Reglas (lector paginado de texto plano).
+// Las 4 "flashcards" de reglas rápidas (lector paginado de la 1ª pestaña).
 // Cada página: título + líneas (párrafos cortos que caben en pantalla).
 
 export const RULE_PAGES = [

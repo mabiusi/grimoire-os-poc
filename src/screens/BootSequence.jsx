@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { SCREENS, useSystem } from '../context/SystemContext.jsx';
 import { useGamepad } from '../hooks/useGamepad.js';
+import { useGrimoireStore } from '../store/useGrimoireStore.js';
 import { sfx } from '../lib/sfx.js';
 
 // Líneas estilo consola de comandos cargando "módulos mágicos".
@@ -25,6 +26,8 @@ const LOGO_HOLD = 4200; // el logo permanece en pantalla para disfrutar la esté
 
 export default function BootSequence() {
   const { reset } = useSystem();
+  const loadDatabase = useGrimoireStore((s) => s.loadDatabase);
+  const dbProgress = useGrimoireStore((s) => s.progress);
   const [revealed, setRevealed] = useState(0);
   const [phase, setPhase] = useState('console'); // 'console' -> 'logo'
   const timers = useRef([]);
@@ -35,6 +38,7 @@ export default function BootSequence() {
 
   useEffect(() => {
     sfx.boot();
+    loadDatabase(); // simula la carga del JSON de la base de conocimiento
     // Revela las líneas una a una.
     for (let i = 1; i <= LINES.length; i++) {
       timers.current.push(
@@ -52,9 +56,10 @@ export default function BootSequence() {
     );
 
     return () => timers.current.forEach(clearTimeout);
-  }, [reset]);
+  }, [reset, loadDatabase]);
 
-  const progress = Math.round((revealed / LINES.length) * 100);
+  // La barra refleja el progreso real de carga de la base de conocimiento.
+  const progress = dbProgress;
 
   return (
     <div className="flex h-full w-full flex-col bg-abyss p-5 font-vt text-moss">
@@ -82,7 +87,7 @@ export default function BootSequence() {
           {/* Barra de carga de "módulos mágicos". */}
           <div className="mt-3">
             <div className="mb-1 flex justify-between font-press text-[8px] text-gold/80">
-              <span>CARGANDO MODULOS</span>
+              <span>CARGANDO BASE 5e</span>
               <span>{progress}%</span>
             </div>
             <div className="h-4 w-full border-2 border-bronze bg-stoneDark p-0.5">
