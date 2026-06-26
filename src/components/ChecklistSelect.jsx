@@ -76,7 +76,7 @@ export default function ChecklistSelect({ title, icon, prompt, items, initial = 
       <div className="flex h-full flex-col p-3">
         <div className="mb-2 flex items-center justify-between">
           {prompt && <p className="font-press text-[9px] text-gold/80">{prompt}</p>}
-          <span className="font-press text-[8px] text-gold/60">
+          <span className="font-press text-hud-xs text-gold/60">
             {checked.size}
             {max ? `/${max}` : ''} marcados
           </span>
@@ -96,11 +96,11 @@ export default function ChecklistSelect({ title, icon, prompt, items, initial = 
                 ].join(' ')}
               >
                 <Cursor visible={active} />
-                <span className={`font-press text-sm ${isChecked ? 'text-moss' : 'text-parchment/40'}`}>
+                <span className={`font-press text-sm ${isChecked ? 'text-moss' : 'text-chromeText/40'}`}>
                   {isChecked ? '☑' : '☐'}
                 </span>
                 <div className="flex-1 font-vt text-lg leading-tight">
-                  <span className={active ? 'text-goldLight' : 'text-parchment/85'}>{it.name}</span>
+                  <span className={active ? 'text-goldLight' : 'text-chromeText/85'}>{it.name}</span>
                   {it.note && <span className="ml-2 text-bronze">{it.note}</span>}
                 </div>
               </div>
@@ -112,10 +112,10 @@ export default function ChecklistSelect({ title, icon, prompt, items, initial = 
             ref={onContinue ? activeRef : null}
             className={[
               'mt-1 flex items-center justify-center gap-2 rounded border-2 px-2 py-2 font-press text-[11px]',
-              onContinue ? 'border-goldLight bg-gold text-ink shadow-bevel' : 'border-moss/60 text-moss',
+              onContinue ? 'border-goldLight bg-gold text-[#2a1c0c] shadow-bevel' : 'border-moss/60 text-moss',
             ].join(' ')}
           >
-            <Cursor visible={onContinue} className={onContinue ? 'text-ink' : ''} />
+            <Cursor visible={onContinue} className={onContinue ? 'text-[#2a1c0c]' : ''} />
             ✓ CONTINUAR
           </div>
         </div>

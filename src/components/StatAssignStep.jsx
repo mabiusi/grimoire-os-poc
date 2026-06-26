@@ -96,7 +96,7 @@ export default function StatAssignStep({ title = 'CREAR · STATS', initial, onCo
         />
       ) : (
         <div className="flex h-full flex-col p-3">
-          <p className="mb-2 font-press text-[8px] text-gold/70">
+          <p className="mb-2 font-press text-hud-xs text-gold/70">
             ←→ AJUSTA · <kbd className="rounded-sm bg-sky px-1 text-abyss">X</kbd> TIRA 4d6
           </p>
 
@@ -114,15 +114,15 @@ export default function StatAssignStep({ title = 'CREAR · STATS', initial, onCo
                 >
                   <Cursor visible={active} />
                   <div className="w-32 font-vt text-lg leading-none">
-                    <div className={active ? 'text-goldLight' : 'text-parchment/85'}>{STAT_NAMES[k]}</div>
-                    <div className="font-press text-[7px] text-gold/60">{k}</div>
+                    <div className={active ? 'text-goldLight' : 'text-chromeText/85'}>{STAT_NAMES[k]}</div>
+                    <div className="font-press text-hud-xs text-gold/60">{k}</div>
                   </div>
                   <div className="h-3 flex-1 overflow-hidden rounded-sm border border-bronze/50 bg-stoneDark">
                     <div className="h-full bg-gradient-to-r from-bronze to-gold" style={{ width: `${(v / MAX) * 100}%` }} />
                   </div>
                   <div className="flex w-24 items-center justify-end gap-1 font-press text-sm">
                     <span className={active && v > MIN ? 'text-gold' : 'text-transparent'}>◀</span>
-                    <span className={active ? 'text-goldLight' : 'text-parchment'}>{v}</span>
+                    <span className={active ? 'text-goldLight' : 'text-chromeText'}>{v}</span>
                     <span className={active && v < MAX ? 'text-gold' : 'text-transparent'}>▶</span>
                     <span className="ml-1 w-7 text-right text-moss">{fmtMod(v)}</span>
                   </div>
@@ -134,10 +134,10 @@ export default function StatAssignStep({ title = 'CREAR · STATS', initial, onCo
             <div
               className={[
                 'mt-1 flex items-center justify-center gap-2 rounded border-2 px-2 py-2 font-press text-[11px]',
-                onSaveRow ? 'border-goldLight bg-gold text-ink shadow-bevel' : 'border-moss/60 text-moss',
+                onSaveRow ? 'border-goldLight bg-gold text-[#2a1c0c] shadow-bevel' : 'border-moss/60 text-moss',
               ].join(' ')}
             >
-              <Cursor visible={onSaveRow} className={onSaveRow ? 'text-ink' : ''} />
+              <Cursor visible={onSaveRow} className={onSaveRow ? 'text-[#2a1c0c]' : ''} />
               ✓ CONFIRMAR STATS
             </div>
           </div>

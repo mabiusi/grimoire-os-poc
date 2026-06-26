@@ -7,16 +7,20 @@ import { Fragment } from 'react';
  * mismo chip, atenuados y tras un divisor. Mantiene la prop `hints` intacta, así
  * ninguna pantalla cambia su llamada.
  */
+// A/X/Y siguen el tema (luminancia por modo); B queda ORO FIJO siempre (identidad
+// del hardware, aunque el acento sea otro). Los textos de A/X/Y/B son literales
+// claros/oscuros para no invertirse con el modo. L/R/Start/Select/D-Pad toman
+// colores del tema (chrome + label/chromeText + borde bronce).
 const BTN = {
-  A: 'bg-blood text-parchment rounded-full',
-  B: 'bg-gold text-ink rounded-full',
-  X: 'bg-sky text-abyss rounded-full',
-  Y: 'bg-moss text-parchment rounded-full',
-  L: 'bg-stone text-parchment rounded-md border border-bronze/70',
-  R: 'bg-stone text-parchment rounded-md border border-bronze/70',
-  START: 'bg-stone text-goldLight rounded-full border border-bronze/70',
-  SELECT: 'bg-stone text-goldLight rounded-full border border-bronze/70',
-  DPAD: 'bg-stone text-parchment rounded border border-bronze/70',
+  A: 'bg-blood text-[#e9d8b4] rounded-full',
+  B: 'bg-[#d8a93a] text-[#2a1c0c] rounded-full',
+  X: 'bg-sky text-[#0c0a07] rounded-full',
+  Y: 'bg-moss text-[#e9d8b4] rounded-full',
+  L: 'bg-stoneDark text-chromeText rounded-md border border-bronze/70',
+  R: 'bg-stoneDark text-chromeText rounded-md border border-bronze/70',
+  START: 'bg-stoneDark text-label rounded-full border border-bronze/70',
+  SELECT: 'bg-stoneDark text-label rounded-full border border-bronze/70',
+  DPAD: 'bg-stoneDark text-chromeText rounded border border-bronze/70',
 };
 const GLYPH = { DPAD: '✚', START: '≡', SELECT: '◧' };
 
@@ -56,12 +60,12 @@ function Chip({ keyStr, label, dim }) {
             </Fragment>
           ))
         ) : (
-          <span className="inline-flex h-[22px] min-w-[22px] items-center justify-center rounded bg-stone px-1 font-press text-hud-sm text-parchment shadow-bevel">
+          <span className="inline-flex h-[22px] min-w-[22px] items-center justify-center rounded bg-stoneDark px-1 font-press text-hud-sm text-chromeText shadow-bevel">
             {keyStr}
           </span>
         )}
       </span>
-      <span className="font-vt text-body-sm leading-none text-parchment">{label}</span>
+      <span className="font-vt text-body-sm leading-none text-chromeText">{label}</span>
     </span>
   );
 }

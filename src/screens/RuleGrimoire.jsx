@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import Frame from '../components/Frame.jsx';
 import Cursor from '../components/Cursor.jsx';
 import PixelIcon from '../components/PixelIcon.jsx';
+import Tabs from '../components/Tabs.jsx';
 import GrimoireTextRenderer from '../components/GrimoireTextRenderer.jsx';
+import { focusRow } from '../lib/focus.js';
 import { useSystem } from '../context/SystemContext.jsx';
 import { useGrimoireStore } from '../store/useGrimoireStore.js';
 import { useGamepad } from '../hooks/useGamepad.js';
@@ -40,22 +42,7 @@ export default function RuleGrimoire() {
   return (
     <Frame title="GRIMORIO DE REGLAS" icon="book" hints={hints}>
       <div className="flex h-full flex-col p-2">
-        {/* Pestañas (L/R) */}
-        <div className="mb-2 flex items-center gap-1">
-          <span className="px-1 font-press text-[10px] text-gold/70">L</span>
-          {SECTIONS.map((label, i) => (
-            <div
-              key={label}
-              className={[
-                'flex-1 rounded-t border-b-2 px-2 py-1.5 text-center font-press text-hud-sm',
-                i === tab ? 'border-goldLight bg-gold text-ink' : 'border-bronze/50 bg-stoneDark text-parchment/60',
-              ].join(' ')}
-            >
-              {label}
-            </div>
-          ))}
-          <span className="px-1 font-press text-[10px] text-gold/70">R</span>
-        </div>
+        <Tabs tabs={SECTIONS} active={tab} className="mb-2" />
 
         <div className="min-h-0 flex-1">
           {tab === 0 ? <FlashcardsReader onBack={exit} /> : <Encyclopedia onBack={exit} />}
@@ -231,9 +218,9 @@ function Encyclopedia({ onBack }) {
           {CATEGORIES.map((cat, i) => {
             const active = i === catIndex;
             return (
-              <div key={cat.id} ref={active ? listRef : null} className={['flex items-center gap-3 rounded border-2 px-3 py-2', active ? 'border-goldLight bg-gold text-ink shadow-bevel' : 'border-bronze/60 bg-stoneDark text-parchment/80'].join(' ')}>
-                <Cursor visible={active} className={active ? 'text-ink' : ''} />
-                <PixelIcon name={cat.icon} size={20} mono={active} />
+              <div key={cat.id} ref={active ? listRef : null} className={['flex items-center gap-3 rounded border-2 px-3 py-2', focusRow(active)].join(' ')}>
+                <Cursor visible={active} className={active ? 'text-[#2a1c0c]' : ''} />
+                <PixelIcon name={cat.icon} size={20} engrave={active} />
                 <span className="flex-1 font-press text-[11px]">{cat.name}</span>
                 <span className="font-vt text-lg opacity-70">{cat.get(db).length}</span>
               </div>
@@ -254,10 +241,10 @@ function Encyclopedia({ onBack }) {
           {items.map((it, i) => {
             const active = i === itemIndex;
             return (
-              <div key={it.id} ref={active ? listRef : null} className={['flex items-center gap-2 rounded border-2 px-3 py-1.5', active ? 'border-goldLight bg-gold text-ink shadow-bevel' : 'border-bronze/50 bg-stoneDark text-parchment/80'].join(' ')}>
-                <Cursor visible={active} className={active ? 'text-ink' : ''} />
+              <div key={it.id} ref={active ? listRef : null} className={['flex items-center gap-2 rounded border-2 px-3 py-1.5', focusRow(active)].join(' ')}>
+                <Cursor visible={active} className={active ? 'text-[#2a1c0c]' : ''} />
                 <span className="flex-1 font-vt text-xl">{it.name}</span>
-                <span className={`font-press text-[8px] ${active ? 'text-ink/70' : 'text-gold/60'}`}>{category.sub(it)}</span>
+                <span className={`font-press text-hud-xs ${active ? 'text-[#2a1c0c]/70' : 'text-gold/60'}`}>{category.sub(it)}</span>
               </div>
             );
           })}

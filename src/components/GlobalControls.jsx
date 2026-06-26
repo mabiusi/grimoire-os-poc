@@ -3,9 +3,11 @@ import Cursor from './Cursor.jsx';
 import PixelIcon from './PixelIcon.jsx';
 import { Layer } from '../context/InputContext.jsx';
 import { SCREENS, useSystem } from '../context/SystemContext.jsx';
+import { ACCENT_LABEL } from '../lib/theme.js';
 import { useGamepad } from '../hooks/useGamepad.js';
 import { sfx } from '../lib/sfx.js';
 import { rollDie, wrapIndex } from '../lib/utils.js';
+import { focusRow } from '../lib/focus.js';
 
 /**
  * Capa de controles GLOBALES (disponibles desde cualquier app):
@@ -66,7 +68,7 @@ function QuickRollPopup({ value }) {
   return (
     <div className="pointer-events-none absolute inset-x-0 top-6 z-[70] flex justify-center">
       <div className={`animate-popin rounded-lg border-2 bg-stoneDark/95 px-6 py-3 text-center shadow-bevel ${color}`}>
-        <div className="flex items-center justify-center gap-1 font-press text-[8px] text-gold/80">
+        <div className="flex items-center justify-center gap-1 font-press text-hud-xs text-gold/80">
           <PixelIcon name="bolt" size={10} /> TIRADA RÁPIDA
         </div>
         <div className="mt-1 font-press text-3xl">{value}</div>
@@ -118,7 +120,7 @@ function SystemMenu({ onClose }) {
             <PixelIcon name={view === 'root' ? 'menu' : 'gear'} size={12} />
             {view === 'root' ? 'MENÚ DE SISTEMA' : 'AJUSTES'}
           </span>
-          <span className="font-press text-[8px] text-gold/60">{view === 'root' ? '[B] Cerrar' : '[B] Volver'}</span>
+          <span className="font-press text-hud-xs text-gold/60">{view === 'root' ? '[B] Cerrar' : '[B] Volver'}</span>
         </div>
         <div className="p-3">
           {view === 'root' ? (
@@ -164,12 +166,12 @@ function RootMenu({ items, onClose }) {
             key={it.label}
             className={[
               'flex items-center gap-2 rounded border-2 px-3 py-2 font-vt text-xl',
-              activeRow ? 'border-goldLight bg-gold text-ink' : 'border-bronze/50 text-parchment/80',
+              focusRow(activeRow),
               it.disabled ? 'opacity-40' : '',
             ].join(' ')}
           >
-            <Cursor visible={activeRow} className={activeRow ? 'text-ink' : ''} />
-            <PixelIcon name={it.icon} size={16} mono={activeRow} />
+            <Cursor visible={activeRow} className={activeRow ? 'text-[#2a1c0c]' : ''} />
+            <PixelIcon name={it.icon} size={16} engrave={activeRow} />
             <span>{it.label}</span>
           </li>
         );
@@ -179,11 +181,12 @@ function RootMenu({ items, onClose }) {
 }
 
 function SettingsMenu({ onBack }) {
-  const { theme, toggleTheme, settings, setSetting } = useSystem();
+  const { theme, toggleTheme, accent, cycleAccent, settings, setSetting } = useSystem();
   const [sel, setSel] = useState(0);
 
   const items = [
     { label: 'Tema', value: theme === 'day' ? 'Día' : 'Noche', valueIcon: theme === 'day' ? 'sun' : 'moon', toggle: toggleTheme },
+    { label: 'Color', value: ACCENT_LABEL[accent], swatch: true, toggle: cycleAccent },
     { label: 'Pantalla CRT', value: settings.crt ? 'ON' : 'OFF', toggle: () => setSetting('crt', !settings.crt) },
     { label: 'Sonido', value: settings.sound ? 'ON' : 'OFF', toggle: () => setSetting('sound', !settings.sound) },
     {
@@ -226,21 +229,24 @@ function SettingsMenu({ onBack }) {
             key={it.label}
             className={[
               'flex items-center justify-between rounded border-2 px-3 py-2 font-vt text-xl',
-              activeRow ? 'border-goldLight bg-gold text-ink' : 'border-bronze/50 text-parchment/80',
+              focusRow(activeRow),
             ].join(' ')}
           >
             <span className="flex items-center gap-2">
-              <Cursor visible={activeRow} className={activeRow ? 'text-ink' : ''} />
+              <Cursor visible={activeRow} className={activeRow ? 'text-[#2a1c0c]' : ''} />
               {it.label}
             </span>
             <span className="flex items-center gap-1.5 font-press text-[10px]">
               {it.valueIcon && <PixelIcon name={it.valueIcon} size={12} mono={activeRow} />}
+              {it.swatch && (
+                <span className="inline-block h-[15px] w-[15px] rounded-sm border border-black/45 bg-gold shadow-[inset_1px_1px_0_rgba(255,255,255,0.25)]" />
+              )}
               {it.value}
             </span>
           </li>
         );
       })}
-      <li className="mt-1 text-center font-press text-[8px] text-gold/60">[A] Cambiar · [B] Volver</li>
+      <li className="mt-1 text-center font-press text-hud-xs text-gold/60">[A] Cambiar · [B] Volver</li>
     </ul>
   );
 }
@@ -262,7 +268,7 @@ function SuspendOverlay({ onResume }) {
     <div className="absolute inset-0 z-[80] flex flex-col items-center justify-center bg-black/95 text-center">
       <PixelIcon name="moon" size={48} className="animate-softpulse" />
       <div className="mt-4 font-press text-sm text-gold/80">SUSPENDIDO</div>
-      <div className="mt-3 animate-blink font-press text-[8px] text-parchment/70">
+      <div className="mt-3 animate-blink font-press text-hud-xs text-chromeText/70">
         ▶ PULSA START PARA DESPERTAR
       </div>
     </div>

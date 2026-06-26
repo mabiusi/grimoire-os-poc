@@ -53,7 +53,7 @@ function PadButton({ button, repeat = false, className = '', children, label }) 
 }
 
 function DPad() {
-  const tip = 'flex items-center justify-center bg-stone text-parchment text-[13px]';
+  const tip = 'flex items-center justify-center bg-stone text-chromeText text-[13px]';
   return (
     <div className="grid h-[120px] w-[120px] grid-cols-3 grid-rows-3">
       <span />
@@ -85,19 +85,19 @@ function FaceButtons() {
   return (
     <div className="grid h-[120px] w-[120px] grid-cols-3 grid-rows-3 place-items-center">
       <span />
-      <PadButton button="x" label="X" className={`${base} bg-sky text-abyss`}>
+      <PadButton button="x" label="X" className={`${base} bg-sky text-[#0c0a07]`}>
         X
       </PadButton>
       <span />
-      <PadButton button="y" label="Y" className={`${base} bg-moss text-parchment`}>
+      <PadButton button="y" label="Y" className={`${base} bg-moss text-[#e9d8b4]`}>
         Y
       </PadButton>
       <span />
-      <PadButton button="a" label="A" className={`${base} bg-blood text-parchment`}>
+      <PadButton button="a" label="A" className={`${base} bg-blood text-[#e9d8b4]`}>
         A
       </PadButton>
       <span />
-      <PadButton button="b" label="B" className={`${base} bg-gold text-ink`}>
+      <PadButton button="b" label="B" className={`${base} bg-[#d8a93a] text-[#2a1c0c]`}>
         B
       </PadButton>
       <span />
@@ -110,7 +110,7 @@ function MiniButton({ button, label, sub }) {
     <PadButton
       button={button}
       label={label}
-      className="flex flex-col items-center rounded-full bg-stone px-3 py-1 font-press text-[7px] leading-tight text-parchment"
+      className="flex flex-col items-center rounded-full bg-stone px-3 py-1 font-press text-hud-xs leading-tight text-chromeText"
     >
       <span>{label}</span>
       <span className="text-gold/70">{sub}</span>
@@ -129,18 +129,18 @@ export default function VirtualGamepad() {
         <PadButton
           button="l"
           label="L"
-          className="flex flex-col items-center rounded-b-xl rounded-t-sm bg-stone px-7 py-1.5 font-press text-[11px] text-parchment"
+          className="flex flex-col items-center rounded-b-xl rounded-t-sm bg-stone px-7 py-1.5 font-press text-[11px] text-chromeText"
         >
           <span>L</span>
-          <span className="text-[6px] text-gold/70">◀ PESTAÑA</span>
+          <span className="text-hud-xs text-gold/70">◀ PESTAÑA</span>
         </PadButton>
         <PadButton
           button="r"
           label="R"
-          className="flex flex-col items-center rounded-b-xl rounded-t-sm bg-stone px-7 py-1.5 font-press text-[11px] text-parchment"
+          className="flex flex-col items-center rounded-b-xl rounded-t-sm bg-stone px-7 py-1.5 font-press text-[11px] text-chromeText"
         >
           <span>R</span>
-          <span className="text-[6px] text-gold/70">PESTAÑA ▶</span>
+          <span className="text-hud-xs text-gold/70">PESTAÑA ▶</span>
         </PadButton>
       </div>
 
@@ -149,7 +149,7 @@ export default function VirtualGamepad() {
         <DPad />
 
         <div className="flex flex-col items-center gap-2">
-          <div className="font-press text-[7px] tracking-[0.2em] text-gold/70">QUESTBOY</div>
+          <div className="font-press text-hud-xs tracking-[0.2em] text-gold/70">QUESTBOY</div>
           <div className="flex gap-2">
             <MiniButton button="select" label="SELECT" sub="Noche" />
             <MiniButton button="start" label="START" sub="Menú" />

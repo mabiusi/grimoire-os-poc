@@ -84,7 +84,7 @@ export default function StatRoller({ statLabel, onResult, onCancel }) {
               className={[
                 'flex h-20 w-20 animate-popin items-center justify-center rounded-xl border-4 font-press text-3xl transition-colors',
                 active ? 'border-goldLight' : 'border-bronze/60',
-                isPicked ? 'bg-gold text-ink' : 'bg-stoneDark text-parchment',
+                isPicked ? 'bg-gold text-[#2a1c0c]' : 'bg-stoneDark text-chromeText',
               ].join(' ')}
             >
               {value}
@@ -94,7 +94,7 @@ export default function StatRoller({ statLabel, onResult, onCancel }) {
       </div>
 
       {/* Marcador de selección */}
-      <div className="mt-4 font-vt text-xl text-parchment/80">
+      <div className="mt-4 font-vt text-xl text-chromeText/80">
         Elegidos: <span className="text-goldLight">{picked.length}/3</span>
         {ready && <span className="ml-3 text-moss">Suma = {sum}</span>}
       </div>
@@ -105,7 +105,7 @@ export default function StatRoller({ statLabel, onResult, onCancel }) {
           'mt-4 rounded border-2 px-5 py-2 font-press text-[11px]',
           sel === 4
             ? ready
-              ? 'border-goldLight bg-gold text-ink shadow-bevel'
+              ? 'border-goldLight bg-gold text-[#2a1c0c] shadow-bevel'
               : 'border-blood/60 bg-stoneDark text-blood'
             : 'border-moss/60 text-moss',
         ].join(' ')}
@@ -113,9 +113,9 @@ export default function StatRoller({ statLabel, onResult, onCancel }) {
         {ready ? `✓ ASIGNAR (${sum})` : 'ELIGE 3 DADOS'}
       </div>
 
-      <p className="mt-4 font-vt text-base text-parchment/50">
+      <p className="mt-4 font-vt text-base text-chromeText/50">
         <kbd className="rounded-sm bg-sky px-1.5 text-abyss">X</kbd> Volver a tirar ·{' '}
-        <kbd className="rounded-sm bg-gold px-1.5 text-ink">B</kbd> Cancelar
+        <kbd className="rounded-sm bg-gold px-1.5 text-[#2a1c0c]">B</kbd> Cancelar
       </p>
     </div>
   );

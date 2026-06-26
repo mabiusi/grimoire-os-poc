@@ -7,6 +7,7 @@ import {
   useState,
 } from 'react';
 import { setSoundEnabled } from '../lib/sfx.js';
+import { ACCENTS } from '../lib/theme.js';
 
 /**
  * "Kernel" de Grimoire OS: navegación + estado global del sistema.
@@ -15,8 +16,10 @@ import { setSoundEnabled } from '../lib/sfx.js';
  *   navigate / goBack / reset.
  *
  * Estado del sistema:
- *   theme      -> 'day' | 'night'  (alternable con Select)
- *   settings   -> { crt, sound }
+ *   theme      -> 'day' | 'night'   (alternable con Select)
+ *   accent     -> color principal: 'gold'|'moss'|'blood'|'sky'|'arcane'
+ *                 (tiñe toda la estructura; se cicla desde Ajustes → "Color")
+ *   settings   -> { crt, sound, motion }
  *   suspended  -> modo reposo (opción "Suspender" del menú Start)
  */
 
@@ -34,6 +37,7 @@ const SystemContext = createContext(null);
 export function SystemProvider({ children }) {
   const [stack, setStack] = useState([SCREENS.BOOT]);
   const [theme, setTheme] = useState('day');
+  const [accent, setAccent] = useState('gold');
   const [settings, setSettings] = useState({ crt: true, sound: true, motion: 'auto' });
   const [suspended, setSuspended] = useState(false);
 
@@ -46,6 +50,10 @@ export function SystemProvider({ children }) {
 
   const toggleTheme = useCallback(
     () => setTheme((t) => (t === 'day' ? 'night' : 'day')),
+    []
+  );
+  const cycleAccent = useCallback(
+    () => setAccent((a) => ACCENTS[(ACCENTS.indexOf(a) + 1) % ACCENTS.length]),
     []
   );
   const setSetting = useCallback(
@@ -71,6 +79,9 @@ export function SystemProvider({ children }) {
       theme,
       setTheme,
       toggleTheme,
+      accent,
+      setAccent,
+      cycleAccent,
       // ajustes
       settings,
       setSetting,
@@ -79,7 +90,7 @@ export function SystemProvider({ children }) {
       suspend: () => setSuspended(true),
       resume: () => setSuspended(false),
     }),
-    [stack, navigate, goBack, reset, theme, toggleTheme, settings, setSetting, suspended]
+    [stack, navigate, goBack, reset, theme, toggleTheme, accent, cycleAccent, settings, setSetting, suspended]
   );
 
   return <SystemContext.Provider value={value}>{children}</SystemContext.Provider>;
