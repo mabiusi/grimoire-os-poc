@@ -32,7 +32,7 @@ const ACTION_ROW = [
  */
 export default function VirtualKeyboard({
   title = 'CREAR · NOMBRE',
-  icon = '⌨️',
+  icon = 'keyb',
   initialValue = '',
   maxLength = 16,
   onSubmit,

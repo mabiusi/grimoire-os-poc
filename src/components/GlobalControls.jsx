@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Cursor from './Cursor.jsx';
+import PixelIcon from './PixelIcon.jsx';
 import { Layer } from '../context/InputContext.jsx';
 import { SCREENS, useSystem } from '../context/SystemContext.jsx';
 import { useGamepad } from '../hooks/useGamepad.js';
@@ -65,7 +66,9 @@ function QuickRollPopup({ value }) {
   return (
     <div className="pointer-events-none absolute inset-x-0 top-6 z-[70] flex justify-center">
       <div className={`animate-popin rounded-lg border-2 bg-stoneDark/95 px-6 py-3 text-center shadow-bevel ${color}`}>
-        <div className="font-press text-[8px] text-gold/80">⚡ TIRADA RÁPIDA</div>
+        <div className="flex items-center justify-center gap-1 font-press text-[8px] text-gold/80">
+          <PixelIcon name="bolt" size={10} /> TIRADA RÁPIDA
+        </div>
         <div className="mt-1 font-press text-3xl">{value}</div>
         <div className="font-vt text-lg">
           d20{crit ? ' · ¡CRÍTICO!' : fail ? ' · ¡Pifia!' : ''}
@@ -88,17 +91,17 @@ function SystemMenu({ onClose }) {
   const ROOT = [
     {
       label: 'Volver al Launcher',
-      icon: '🏰',
+      icon: 'castle',
       disabled: current === SCREENS.LAUNCHER,
       action: () => {
         reset(SCREENS.LAUNCHER);
         onClose();
       },
     },
-    { label: 'Ajustes', icon: '⚙️', action: () => setView('settings') },
+    { label: 'Ajustes', icon: 'gear', action: () => setView('settings') },
     {
       label: 'Suspender',
-      icon: '🌙',
+      icon: 'moon',
       action: () => {
         sfx.suspend();
         suspend();
@@ -111,8 +114,9 @@ function SystemMenu({ onClose }) {
     <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/70">
       <div className="w-[78%] rounded-lg border-2 border-gold bg-stoneDark shadow-bevel">
         <div className="flex items-center justify-between border-b-2 border-gold/70 px-4 py-2">
-          <span className="font-press text-[11px] text-goldLight">
-            {view === 'root' ? '☰ MENÚ DE SISTEMA' : '⚙ AJUSTES'}
+          <span className="flex items-center gap-1.5 font-press text-[11px] text-goldLight">
+            <PixelIcon name={view === 'root' ? 'menu' : 'gear'} size={12} />
+            {view === 'root' ? 'MENÚ DE SISTEMA' : 'AJUSTES'}
           </span>
           <span className="font-press text-[8px] text-gold/60">{view === 'root' ? '[B] Cerrar' : '[B] Volver'}</span>
         </div>
@@ -165,7 +169,7 @@ function RootMenu({ items, onClose }) {
             ].join(' ')}
           >
             <Cursor visible={activeRow} className={activeRow ? 'text-ink' : ''} />
-            <span className="text-base">{it.icon}</span>
+            <PixelIcon name={it.icon} size={16} mono={activeRow} />
             <span>{it.label}</span>
           </li>
         );
@@ -179,9 +183,14 @@ function SettingsMenu({ onBack }) {
   const [sel, setSel] = useState(0);
 
   const items = [
-    { label: 'Tema', value: theme === 'day' ? 'Día ☀' : 'Noche ☾', toggle: toggleTheme },
+    { label: 'Tema', value: theme === 'day' ? 'Día' : 'Noche', valueIcon: theme === 'day' ? 'sun' : 'moon', toggle: toggleTheme },
     { label: 'Pantalla CRT', value: settings.crt ? 'ON' : 'OFF', toggle: () => setSetting('crt', !settings.crt) },
     { label: 'Sonido', value: settings.sound ? 'ON' : 'OFF', toggle: () => setSetting('sound', !settings.sound) },
+    {
+      label: 'Movimiento',
+      value: { auto: 'Auto', reduced: 'Reducido', full: 'Completo' }[settings.motion],
+      toggle: () => setSetting('motion', { auto: 'reduced', reduced: 'full', full: 'auto' }[settings.motion]),
+    },
   ];
 
   const move = (n) => {
@@ -224,7 +233,10 @@ function SettingsMenu({ onBack }) {
               <Cursor visible={activeRow} className={activeRow ? 'text-ink' : ''} />
               {it.label}
             </span>
-            <span className="font-press text-[10px]">{it.value}</span>
+            <span className="flex items-center gap-1.5 font-press text-[10px]">
+              {it.valueIcon && <PixelIcon name={it.valueIcon} size={12} mono={activeRow} />}
+              {it.value}
+            </span>
           </li>
         );
       })}
@@ -248,7 +260,7 @@ function SuspendOverlay({ onResume }) {
 
   return (
     <div className="absolute inset-0 z-[80] flex flex-col items-center justify-center bg-black/95 text-center">
-      <div className="animate-softpulse text-5xl">🌙</div>
+      <PixelIcon name="moon" size={48} className="animate-softpulse" />
       <div className="mt-4 font-press text-sm text-gold/80">SUSPENDIDO</div>
       <div className="mt-3 animate-blink font-press text-[8px] text-parchment/70">
         ▶ PULSA START PARA DESPERTAR

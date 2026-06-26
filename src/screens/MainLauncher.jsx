@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Frame from '../components/Frame.jsx';
 import Cursor from '../components/Cursor.jsx';
+import PixelIcon from '../components/PixelIcon.jsx';
 import { SCREENS, useSystem } from '../context/SystemContext.jsx';
 import { useGamepad } from '../hooks/useGamepad.js';
 import { sfx } from '../lib/sfx.js';
@@ -8,25 +9,25 @@ import { sfx } from '../lib/sfx.js';
 const APPS = [
   {
     screen: SCREENS.CHARACTER,
-    icon: '📜',
+    icon: 'scroll',
     name: 'Hojas de\nPersonaje',
     desc: 'Fichas de personaje multi-sistema (D&D, Cthulhu...)',
   },
   {
     screen: SCREENS.DICE,
-    icon: '🎲',
+    icon: 'dice',
     name: 'Dados\nVirtuales',
     desc: 'Lanza d4, d6, d8, d10, d12 y d20 con un botón.',
   },
   {
     screen: SCREENS.RULES,
-    icon: '📖',
+    icon: 'book',
     name: 'Grimorio\nde Reglas',
     desc: 'Consulta reglas básicas sin abrir el manual.',
   },
   {
     screen: SCREENS.ADVENTURE,
-    icon: '🗡️',
+    icon: 'sword',
     name: 'Aventura\nde Texto',
     desc: 'Un libro-juego de mazmorras en tu bolsillo.',
   },
@@ -61,7 +62,7 @@ export default function MainLauncher() {
   return (
     <Frame
       title="GRIMOIRE OS"
-      icon="🏰"
+      icon="castle"
       hints={[
         ['↑↓←→', 'Mover'],
         ['A', 'Abrir'],
@@ -85,10 +86,8 @@ export default function MainLauncher() {
                 {active && (
                   <Cursor className="absolute left-1.5 top-1.5 text-ink" />
                 )}
-                <span
-                  className={`text-4xl ${active ? 'drop-shadow-[2px_2px_0_rgba(0,0,0,0.4)]' : 'opacity-80'}`}
-                >
-                  {app.icon}
+                <span className={active ? 'drop-shadow-[2px_2px_0_rgba(0,0,0,0.4)]' : 'opacity-90'}>
+                  <PixelIcon name={app.icon} size={40} mono={active} />
                 </span>
                 <span className="mt-2 whitespace-pre-line font-press text-[9px] leading-relaxed">
                   {app.name}
@@ -100,7 +99,7 @@ export default function MainLauncher() {
 
         {/* Pie con la descripción de la app enfocada. */}
         <div className="mt-3 flex h-12 items-center rounded border-2 border-bronze bg-stoneDark px-3">
-          <span className="mr-2 text-xl">{APPS[index].icon}</span>
+          <PixelIcon name={APPS[index].icon} size={18} className="mr-2" />
           <p className="font-vt text-lg leading-tight text-goldLight">{APPS[index].desc}</p>
         </div>
       </div>

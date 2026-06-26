@@ -12,3 +12,10 @@ export function clamp(value, min, max) {
 export function rollDie(n) {
   return Math.floor(Math.random() * n) + 1;
 }
+
+// ¿Reducir movimiento? Según el ajuste del usuario + prefers-reduced-motion (P6).
+export function isReducedMotion(motion) {
+  const osReduced =
+    typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  return motion === 'reduced' || (motion === 'auto' && osReduced);
+}

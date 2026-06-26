@@ -34,7 +34,7 @@ const SystemContext = createContext(null);
 export function SystemProvider({ children }) {
   const [stack, setStack] = useState([SCREENS.BOOT]);
   const [theme, setTheme] = useState('day');
-  const [settings, setSettings] = useState({ crt: true, sound: true });
+  const [settings, setSettings] = useState({ crt: true, sound: true, motion: 'auto' });
   const [suspended, setSuspended] = useState(false);
 
   const navigate = useCallback((screen) => setStack((p) => [...p, screen]), []);

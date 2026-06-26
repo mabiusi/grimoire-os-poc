@@ -75,7 +75,7 @@ export default function StatAssignStep({ title = 'CREAR · STATS', initial, onCo
   return (
     <Frame
       title={title}
-      icon="🎲"
+      icon="dice"
       hints={
         rolling
           ? [['←→', 'Dado'], ['A', 'Elegir'], ['X', 'Re-tirar'], ['B', 'Cancelar']]

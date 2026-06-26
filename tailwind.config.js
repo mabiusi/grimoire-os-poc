@@ -23,6 +23,17 @@ export default {
         press: ['"Press Start 2P"', 'monospace'], // títulos / etiquetas
         vt: ['"VT323"', 'monospace'],             // cuerpo de texto legible
       },
+      // Escala tipográfica (P1). Press Start 2P: piso 9px, sólo HUD/labels/números.
+      // VT323: ≥16px para cualquier información (nombres, descripciones, datos).
+      fontSize: {
+        'hud-xs': ['9px', { letterSpacing: '0.04em' }], // chips, key-caps, eyebrows
+        'hud-sm': ['10px', { letterSpacing: '0.04em' }], // pestañas, meta-labels
+        hud: ['12px'], // títulos de panel / app
+        'hud-lg': ['16px'], // encabezados de pantalla
+        'body-sm': ['16px'], // piso para CUALQUIER dato que se lee
+        body: ['19px'],
+        'body-lg': ['22px'],
+      },
       boxShadow: {
         bevel: 'inset 2px 2px 0 rgba(255,255,255,0.12), inset -2px -2px 0 rgba(0,0,0,0.55)',
         bevelIn: 'inset -2px -2px 0 rgba(255,255,255,0.10), inset 2px 2px 0 rgba(0,0,0,0.55)',
