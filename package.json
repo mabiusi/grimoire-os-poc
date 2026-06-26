@@ -1,7 +1,7 @@
 {
   "name": "grimoire-os",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.4.0",
   "type": "module",
   "description": "POC web del firmware Grimoire OS para la consola QuestBoy (ESP32)",
   "scripts": {
