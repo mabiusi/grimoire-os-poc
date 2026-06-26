@@ -1,17 +1,19 @@
 {
   "name": "grimoire-os",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.4.0",
   "type": "module",
   "description": "POC web del firmware Grimoire OS para la consola QuestBoy (ESP32)",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:data": "node scripts/build-data.js"
   },
   "dependencies": {
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.1",

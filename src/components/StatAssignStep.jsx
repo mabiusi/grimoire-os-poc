@@ -5,7 +5,7 @@ import StatRoller from './StatRoller.jsx';
 import { useGamepad } from '../hooks/useGamepad.js';
 import { sfx } from '../lib/sfx.js';
 import { clamp, wrapIndex } from '../lib/utils.js';
-import { STAT_KEYS, STAT_NAMES } from '../data/dnd5e.js';
+import { STAT_KEYS, STAT_NAMES } from '../data/constants.js';
 
 const MIN = 0;
 const MAX = 20;
