@@ -78,7 +78,7 @@ function FlashcardsReader({ onBack }) {
   const isLast = page === total - 1;
 
   return (
-    <div className="flex h-full flex-col rounded border-2 border-gold bg-parchment text-ink shadow-[inset_0_0_30px_rgba(120,80,20,0.25)]">
+    <div className="flex h-full flex-col rounded border-2 border-gold bg-parchment text-ink shadow-[inset_0_0_30px_var(--gr-parchInset)]">
       <div className="flex items-center justify-between border-b-2 border-gold px-4 py-2">
         <h2 className="font-press text-hud text-blood">{current.title}</h2>
         <span className="font-press text-hud-xs text-bronze">Pág. {page + 1}/{total}</span>
@@ -255,7 +255,7 @@ function Encyclopedia({ onBack }) {
 
   const d = category.detail(item);
   return (
-    <div className="flex h-full flex-col rounded border-2 border-gold bg-parchment text-ink shadow-[inset_0_0_30px_rgba(120,80,20,0.25)]">
+    <div className="flex h-full flex-col rounded border-2 border-gold bg-parchment text-ink shadow-[inset_0_0_30px_var(--gr-parchInset)]">
       <div className="border-b-2 border-gold px-4 py-2">
         <h2 className="font-press text-[12px] leading-relaxed text-blood">{d.title}</h2>
         <p className="font-vt text-lg text-bronze">{d.subtitle}</p>

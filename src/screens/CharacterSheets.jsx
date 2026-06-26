@@ -227,7 +227,7 @@ function SheetViewer({ charId, onBack, onLevelUp }) {
         <Tabs tabs={TABS} active={tab} className="mb-2" />
 
         {/* Panel pergamino */}
-        <div className="relative min-h-0 flex-1 overflow-hidden rounded border-2 border-gold bg-parchment text-ink shadow-[inset_0_0_30px_rgba(120,80,20,0.25)]">
+        <div className="relative min-h-0 flex-1 overflow-hidden rounded border-2 border-gold bg-parchment text-ink shadow-[inset_0_0_30px_var(--gr-parchInset)]">
           {/* Cabecera: identidad compacta + badge de datos fijos */}
           <div className="flex items-center justify-between border-b border-gold/60 px-4 pt-2 pb-1.5">
             <div className="min-w-0">
@@ -273,7 +273,10 @@ function SheetViewer({ charId, onBack, onLevelUp }) {
           <div className="pointer-events-none absolute right-1.5 bottom-3 top-[7.6rem] w-[3px] rounded bg-bronze/25">
             <div className="absolute left-0 w-[3px] rounded bg-gold/80" style={{ height: `${railH}%`, top: `${railTop}%` }} />
           </div>
-          {!edges.bottom && <div className="parchment-fade pointer-events-none absolute inset-x-0 bottom-0 h-7" />}
+          {/* Fade inferior sólo en la pestaña de TEXTO (Stats): en las listas
+              interactivas tapaba la fila activa del fondo (artefacto de "línea")
+              y el riel ya indica la posición de scroll. */}
+          {tab === 0 && !edges.bottom && <div className="parchment-fade pointer-events-none absolute inset-x-0 bottom-0 h-7" />}
         </div>
       </div>
     </Frame>
