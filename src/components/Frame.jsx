@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import ControlBar from './ControlBar.jsx';
 import PixelIcon from './PixelIcon.jsx';
+import { useSystem } from '../context/SystemContext.jsx';
 
 // Reloj "del sistema" en la barra superior (hora real, formato 24h).
 function useClock() {
@@ -16,15 +17,20 @@ function useClock() {
 
 function TopBar({ title, icon }) {
   const clock = useClock();
+  const { theme } = useSystem();
   return (
-    <header className="flex h-9 shrink-0 items-center justify-between border-b-2 border-gold/70 bg-gradient-to-b from-stone to-stoneDark px-3 shadow-bevel">
-      <div className="flex items-center gap-2 font-press text-[10px] text-goldLight text-pixel-shadow">
+    <header className="flex h-[38px] shrink-0 items-center justify-between border-b-2 border-[color:var(--gr-barBorder)] bg-gradient-to-b from-stone to-stoneDark px-3 shadow-bevel">
+      <div className="flex items-center gap-2 font-press text-hud text-label text-pixel-shadow">
         {icon ? <PixelIcon name={icon} size={16} /> : null}
         <span>{title}</span>
       </div>
-      <div className="flex items-center gap-2 font-press text-hud-xs text-gold/80">
+      <div className="flex items-center gap-2 font-press text-hud-xs text-chromeDim">
         <span>{clock}</span>
-        <span className="text-moss" title="batería">▮▮▮▯</span>
+        <PixelIcon
+          name={theme === 'night' ? 'moon' : 'sun'}
+          size={12}
+          title={theme === 'night' ? 'Noche' : 'Día'}
+        />
       </div>
     </header>
   );
@@ -36,7 +42,7 @@ function TopBar({ title, icon }) {
  */
 export default function Frame({ title, icon, hints, children }) {
   return (
-    <div className="flex h-full w-full flex-col bg-abyss text-parchment">
+    <div className="flex h-full w-full flex-col bg-abyss text-chromeText">
       <TopBar title={title} icon={icon} />
       <main className="relative min-h-0 flex-1">{children}</main>
       <ControlBar hints={hints} />

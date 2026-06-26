@@ -3,21 +3,33 @@ export default {
   content: ['./index.html', './src/**/*.{js,jsx}'],
   theme: {
     extend: {
-      // Paleta "Retro Color" 16-bits: pergamino, oro, piedra y abismo.
+      // Paleta "Retro Color" themeable: los tokens leen CSS vars (--gr-*) que el
+      // kernel computa de (modo Día/Noche × acento). `<alpha-value>` conserva los
+      // modificadores de opacidad de Tailwind (text-parchment/80, border-bronze/60…)
+      // y de paso arregla el bug de contraste del viejo theme-night !important.
+      // El "oro" del sistema ES el acento activo (gold = accent.m).
       colors: {
-        abyss: '#0c0a07',       // fondo de pantalla (casi negro cálido)
-        stoneDark: '#1c1812',   // paneles oscuros
-        stone: '#33291d',       // barras / marcos
-        bronze: '#8a6d3b',      // bordes secundarios
-        gold: '#d8a93a',        // bordes / acentos principales
-        goldLight: '#f3d27a',   // resaltado / brillo
-        parchment: '#e9d8b4',   // pergamino claro (paneles de texto)
-        parchmentDark: '#d3bd8e',
-        ink: '#2a1c0c',         // texto oscuro sobre pergamino
-        blood: '#9b2c2c',       // peligro / HP
-        moss: '#5a7d3a',        // éxito / naturaleza
-        arcane: '#7b6cc4',      // magia / cordura
-        sky: '#5aa9c4',         // información
+        abyss: 'rgb(var(--gr-abyss) / <alpha-value>)',           // fondo de pantalla
+        stoneDark: 'rgb(var(--gr-stoneDark) / <alpha-value>)',   // paneles (chrome)
+        stone: 'rgb(var(--gr-stone) / <alpha-value>)',           // barras (chromeTop)
+        bronze: 'rgb(var(--gr-bronze) / <alpha-value>)',         // bordes secundarios
+        gold: 'rgb(var(--gr-gold) / <alpha-value>)',             // acento principal
+        goldLight: 'rgb(var(--gr-goldLight) / <alpha-value>)',   // acento claro / brillo
+        accDim: 'rgb(var(--gr-accDim) / <alpha-value>)',         // acento oscuro
+        parchment: 'rgb(var(--gr-parchment) / <alpha-value>)',   // panel de lectura
+        parchmentDark: 'rgb(var(--gr-parchmentDark) / <alpha-value>)',
+        ink: 'rgb(var(--gr-ink) / <alpha-value>)',               // texto sobre pergamino
+        blood: 'rgb(var(--gr-blood) / <alpha-value>)',           // peligro / HP / botón A
+        moss: 'rgb(var(--gr-moss) / <alpha-value>)',             // éxito / botón Y
+        arcane: 'rgb(var(--gr-arcane) / <alpha-value>)',         // magia / cordura
+        sky: 'rgb(var(--gr-sky) / <alpha-value>)',               // info / botón X
+        // chrome (barras de sistema, fuera del pergamino)
+        chromeText: 'rgb(var(--gr-chromeText) / <alpha-value>)', // texto sobre chrome
+        chromeDim: 'rgb(var(--gr-chromeDim) / <alpha-value>)',
+        label: 'rgb(var(--gr-label) / <alpha-value>)',           // títulos/etiquetas
+        advText: 'rgb(var(--gr-advText) / <alpha-value>)',       // fósforo del libro-juego
+        poolBg: 'rgb(var(--gr-poolBg) / <alpha-value>)',         // bandeja de dados
+        borderDim: 'rgb(var(--gr-borderDim) / 0.5)',             // borde inactivo
       },
       fontFamily: {
         press: ['"Press Start 2P"', 'monospace'], // títulos / etiquetas

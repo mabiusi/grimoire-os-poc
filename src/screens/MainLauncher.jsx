@@ -5,6 +5,7 @@ import PixelIcon from '../components/PixelIcon.jsx';
 import { SCREENS, useSystem } from '../context/SystemContext.jsx';
 import { useGamepad } from '../hooks/useGamepad.js';
 import { sfx } from '../lib/sfx.js';
+import { focusRow } from '../lib/focus.js';
 
 const APPS = [
   {
@@ -78,16 +79,14 @@ export default function MainLauncher() {
                 key={app.screen}
                 className={[
                   'relative flex flex-col items-center justify-center rounded border-2 text-center transition-colors',
-                  active
-                    ? 'border-goldLight bg-gold text-ink shadow-bevel'
-                    : 'border-bronze/60 bg-stoneDark text-parchment/80',
+                  focusRow(active),
                 ].join(' ')}
               >
                 {active && (
-                  <Cursor className="absolute left-1.5 top-1.5 text-ink" />
+                  <Cursor className="absolute left-1.5 top-1.5 text-[#2a1c0c]" />
                 )}
                 <span className={active ? 'drop-shadow-[2px_2px_0_rgba(0,0,0,0.4)]' : 'opacity-90'}>
-                  <PixelIcon name={app.icon} size={40} mono={active} />
+                  <PixelIcon name={app.icon} size={42} engrave={active} />
                 </span>
                 <span className="mt-2 whitespace-pre-line font-press text-[9px] leading-relaxed">
                   {app.name}

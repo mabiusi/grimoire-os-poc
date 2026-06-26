@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import PixelIcon from '../components/PixelIcon.jsx';
 import { SCREENS, useSystem } from '../context/SystemContext.jsx';
+import { themeVars } from '../lib/theme.js';
 import { useGamepad } from '../hooks/useGamepad.js';
 import { useGrimoireStore } from '../store/useGrimoireStore.js';
 import { sfx } from '../lib/sfx.js';
@@ -63,7 +64,7 @@ export default function BootSequence() {
   const progress = dbProgress;
 
   return (
-    <div className="flex h-full w-full flex-col bg-abyss p-5 font-vt text-moss">
+    <div className="flex h-full w-full flex-col bg-abyss p-5 font-vt text-moss" style={themeVars('night', 'gold')}>
       {phase === 'console' ? (
         <>
           <div className="flex-1 text-[19px] leading-tight">
@@ -75,7 +76,7 @@ export default function BootSequence() {
                     ? 'text-moss'
                     : line.startsWith('GRIMOIRE')
                     ? 'mb-1 text-goldLight'
-                    : 'text-parchment/80'
+                    : 'text-chromeText/80'
                 }
               >
                 {line || ' '}
@@ -87,7 +88,7 @@ export default function BootSequence() {
 
           {/* Barra de carga de "módulos mágicos". */}
           <div className="mt-3">
-            <div className="mb-1 flex justify-between font-press text-[8px] text-gold/80">
+            <div className="mb-1 flex justify-between font-press text-hud-xs text-gold/80">
               <span>CARGANDO BASE 5e</span>
               <span>{progress}%</span>
             </div>
@@ -111,8 +112,8 @@ export default function BootSequence() {
             <br />
             <span className="text-gold">OS</span>
           </h1>
-          <p className="mt-4 font-vt text-xl text-parchment/70">Herramientas para aventureros</p>
-          <p className="mt-6 animate-blink font-press text-[8px] text-moss">
+          <p className="mt-4 font-vt text-xl text-chromeText/70">Herramientas para aventureros</p>
+          <p className="mt-6 animate-blink font-press text-hud-xs text-moss">
             ▶ PULSA Z PARA COMENZAR
           </p>
         </div>

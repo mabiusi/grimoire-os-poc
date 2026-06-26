@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import Cursor from './Cursor.jsx';
 import { useGrimoireStore } from '../store/useGrimoireStore.js';
 import { useGamepad } from '../hooks/useGamepad.js';
 import { sfx } from '../lib/sfx.js';
 import { clamp, wrapIndex } from '../lib/utils.js';
+import { focusRow } from '../lib/focus.js';
 import { spellOf } from '../store/derive.js';
 
 /**
@@ -86,7 +88,8 @@ export default function SpellTracker({ charId }) {
         }
         if (row.type === 'cantrip') {
           return (
-            <div key={ri} ref={active ? activeRef : null} className={`flex items-center gap-2 rounded px-2 py-0.5 text-lg ${active ? 'bg-gold/30' : ''}`}>
+            <div key={ri} ref={active ? activeRef : null} className={`flex items-center gap-2 rounded border-2 px-2 py-0.5 text-lg ${focusRow(active, { onParch: true })}`}>
+              <Cursor visible={active} className={active ? 'text-[#2a1c0c]' : ''} />
               <span className="text-arcane">●</span>{row.name}
             </div>
           );
@@ -94,18 +97,20 @@ export default function SpellTracker({ charId }) {
         if (row.type === 'spell') {
           const prep = magic.preparedIds.includes(row.id);
           return (
-            <div key={ri} ref={active ? activeRef : null} className={`flex items-center gap-2 rounded px-2 py-0.5 text-lg ${active ? 'bg-gold/30' : ''}`}>
+            <div key={ri} ref={active ? activeRef : null} className={`flex items-center gap-2 rounded border-2 px-2 py-0.5 text-lg ${focusRow(active, { onParch: true })}`}>
+              <Cursor visible={active} className={active ? 'text-[#2a1c0c]' : ''} />
               <span className={prep ? 'text-blood' : 'text-bronze/50'}>{prep ? '★' : '☆'}</span>
               <span className={prep ? 'font-semibold' : ''}>{row.name}</span>
-              {prep && <span className="ml-auto font-press text-[7px] text-blood">PREP.</span>}
+              {prep && <span className="ml-auto font-press text-hud-xs text-blood">PREP.</span>}
             </div>
           );
         }
         // slots
         const used = magic.slots[row.level].used;
         return (
-          <div key={ri} ref={active ? activeRef : null} className={`flex items-center gap-2 rounded px-2 py-1 ${active ? 'bg-gold/30' : ''}`}>
-            <span className="w-16 font-press text-[9px] text-bronze">Nivel {row.level}</span>
+          <div key={ri} ref={active ? activeRef : null} className={`flex items-center gap-2 rounded border-2 px-2 py-1 ${focusRow(active, { onParch: true })}`}>
+            <Cursor visible={active} className={active ? 'text-[#2a1c0c]' : ''} />
+            <span className="w-16 font-press text-hud-xs text-bronze">Nivel {row.level}</span>
             <div className="flex gap-1.5">
               {Array.from({ length: row.total }, (_, b) => {
                 const spent = b < used;
@@ -122,7 +127,7 @@ export default function SpellTracker({ charId }) {
         );
       })}
       <p className="mt-3 border-t border-bronze/30 pt-2 font-vt text-base text-bronze">
-        <kbd className="rounded-sm bg-gold px-1 text-ink">A</kbd> prepara / gasta espacios · <kbd className="rounded-sm bg-gold px-1 text-ink">←→</kbd> elige burbuja
+        <kbd className="rounded-sm bg-gold px-1 text-[#2a1c0c]">A</kbd> prepara / gasta espacios · <kbd className="rounded-sm bg-gold px-1 text-[#2a1c0c]">←→</kbd> elige burbuja
       </p>
     </div>
   );

@@ -113,9 +113,9 @@ export default function DiceRoller() {
                   ? m === 'adv'
                     ? 'border-moss bg-moss text-abyss'
                     : m === 'dis'
-                    ? 'border-blood bg-blood text-parchment'
-                    : 'border-goldLight bg-gold text-ink'
-                  : 'border-bronze/50 text-parchment/55'
+                    ? 'border-blood bg-blood text-[#e9d8b4]'
+                    : 'border-goldLight bg-gold text-[#2a1c0c]'
+                  : 'border-bronze/50 text-chromeText/55'
               }`}
             >
               {txt}
@@ -148,7 +148,7 @@ export default function DiceRoller() {
         <div className="rounded border-2 border-gold bg-stoneDark px-3 py-2">
           <div className="flex items-center justify-between">
             <span className="font-press text-hud-xs text-gold/70">TU TIRADA</span>
-            <span className="font-press text-[8px] text-bronze">
+            <span className="font-press text-hud-xs text-bronze">
               {count} dado{count === 1 ? '' : 's'}
               {mode !== 'normal' && count > 0 ? ` · ${MODES[mode].toUpperCase()}` : ''}
             </span>
@@ -156,22 +156,22 @@ export default function DiceRoller() {
           <div className="mt-1.5 flex items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
               {count === 0 ? (
-                <span className="font-vt text-body-sm text-parchment/40">(vacío)</span>
+                <span className="font-vt text-body-sm text-chromeText/40">(vacío)</span>
               ) : (
                 DICE.filter((s) => pool[s] > 0).map((s, i) => (
                   <Fragment key={s}>
                     {i > 0 && <span className="font-press text-sm text-bronze">+</span>}
                     <div className="relative flex flex-col items-center">
-                      {pool[s] > 1 && <span className="absolute -right-1 -top-1 z-10 rounded-full bg-gold px-1 font-press text-[8px] text-ink">×{pool[s]}</span>}
+                      {pool[s] > 1 && <span className="absolute -right-1 -top-1 z-10 rounded-full bg-gold px-1 font-press text-hud-xs text-[#2a1c0c]">×{pool[s]}</span>}
                       <DieShape sides={s} value={s === 100 ? '%' : s} size={32} />
-                      <span className="mt-0.5 font-press text-[8px] text-gold/70">d{s}</span>
+                      <span className="mt-0.5 font-press text-hud-xs text-gold/70">d{s}</span>
                     </div>
                   </Fragment>
                 ))
               )}
             </div>
             <span className="flex shrink-0 items-center gap-2 font-press text-[11px] text-goldLight">
-              <span className="inline-flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-blood font-press text-hud-sm text-parchment shadow-bevel">A</span>
+              <span className="inline-flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-blood font-press text-hud-sm text-[#e9d8b4] shadow-bevel">A</span>
               TIRAR
             </span>
           </div>
@@ -214,7 +214,7 @@ function ResultPanel({ result, rolling }) {
                         />
                       ))}
                     </div>
-                    <span className={`font-press text-[8px] ${d.mode === 'adv' ? 'text-moss' : 'text-blood'}`}>
+                    <span className={`font-press text-hud-xs ${d.mode === 'adv' ? 'text-moss' : 'text-blood'}`}>
                       d20 · {d.mode === 'adv' ? 'VENTAJA' : 'DESVENTAJA'}
                     </span>
                   </div>
@@ -223,7 +223,7 @@ function ResultPanel({ result, rolling }) {
               return (
                 <div key={i} className="flex flex-col items-center gap-1">
                   <DieShape sides={d.sides} value={rolling ? rnd(d.sides) : d.value} size={60} shaking={rolling} />
-                  <span className="font-press text-[8px] text-bronze">d{d.sides}</span>
+                  <span className="font-press text-hud-xs text-bronze">d{d.sides}</span>
                 </div>
               );
             })}
@@ -234,7 +234,7 @@ function ResultPanel({ result, rolling }) {
         <div className="flex items-center justify-between rounded border-2 border-gold bg-stoneDark px-4 py-2">
           <div className="flex min-w-0 flex-col">
             <span className="font-press text-hud-xs text-gold/70">TOTAL</span>
-            {!rolling && <span className="mt-1 truncate font-vt text-body-sm text-parchment/70">{breakdown}</span>}
+            {!rolling && <span className="mt-1 truncate font-vt text-body-sm text-chromeText/70">{breakdown}</span>}
           </div>
           {rolling ? (
             <span className="animate-blink font-press text-3xl text-gold/70">…</span>

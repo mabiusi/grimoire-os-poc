@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import PixelIcon from './PixelIcon.jsx';
+import Cursor from './Cursor.jsx';
 import { useGrimoireStore } from '../store/useGrimoireStore.js';
 import { useGamepad } from '../hooks/useGamepad.js';
 import { sfx } from '../lib/sfx.js';
 import { clamp, wrapIndex } from '../lib/utils.js';
+import { focusRow } from '../lib/focus.js';
 import { classOf } from '../store/derive.js';
 
 /**
@@ -117,11 +119,11 @@ export default function CombatTracker({ charId }) {
 
       {/* Salvaciones de muerte */}
       <Row label="Salv. Muerte" active={activeIdx === rows.findIndex((r) => r.type === 'death')} rowRef={row?.type === 'death' ? activeRef : null}>
-        <span className="mr-1 font-press text-[7px] text-moss">✓</span>
+        <span className="mr-1 font-press text-hud-xs text-moss">✓</span>
         {[0, 1, 2].map((i) => (
           <Bubble key={`s${i}`} filled={i < char.deathSaves.success} focused={row?.type === 'death' && sub === i} tone="moss" />
         ))}
-        <span className="mx-1 font-press text-[7px] text-blood">✕</span>
+        <span className="mx-1 font-press text-hud-xs text-blood">✕</span>
         {[0, 1, 2].map((i) => (
           <Bubble key={`f${i}`} filled={i < char.deathSaves.fail} focused={row?.type === 'death' && sub === 3 + i} tone="blood" />
         ))}
@@ -134,7 +136,8 @@ export default function CombatTracker({ charId }) {
         const active = activeIdx === rowIdx;
         const on = char.conditions.includes(cond.id);
         return (
-          <div key={cond.id} ref={active ? activeRef : null} className={`flex items-center gap-2 rounded px-2 py-0.5 text-lg ${active ? 'bg-gold/30' : ''}`}>
+          <div key={cond.id} ref={active ? activeRef : null} className={`flex items-center gap-2 rounded border-2 px-2 py-0.5 text-lg ${focusRow(active, { onParch: true })}`}>
+            <Cursor visible={active} className={active ? 'text-[#2a1c0c]' : ''} />
             <span className={on ? 'text-blood' : 'text-bronze/40'}>{on ? '☑' : '☐'}</span>
             <PixelIcon name={`cond_${cond.id}`} size={16} title={cond.name} />
             <span className={on ? 'font-semibold' : ''}>{cond.name}</span>
@@ -143,7 +146,7 @@ export default function CombatTracker({ charId }) {
       })}
 
       <p className="mt-3 border-t border-bronze/30 pt-2 font-vt text-base text-bronze">
-        <kbd className="rounded-sm bg-gold px-1 text-ink">←→</kbd> elige botón · <kbd className="rounded-sm bg-gold px-1 text-ink">A</kbd> aplicar
+        <kbd className="rounded-sm bg-gold px-1 text-[#2a1c0c]">←→</kbd> elige botón · <kbd className="rounded-sm bg-gold px-1 text-[#2a1c0c]">A</kbd> aplicar
       </p>
     </div>
   );
@@ -151,8 +154,8 @@ export default function CombatTracker({ charId }) {
 
 function Row({ label, active, rowRef, children }) {
   return (
-    <div ref={rowRef} className={`mb-1 flex items-center gap-2 rounded px-2 py-1 ${active ? 'bg-gold/30' : ''}`}>
-      <span className="w-24 font-press text-[8px] text-bronze">{label}</span>
+    <div ref={rowRef} className={`mb-1 flex items-center gap-2 rounded border-2 px-2 py-1 ${focusRow(active, { onParch: true })}`}>
+      <span className="w-24 font-press text-hud-xs text-bronze">{label}</span>
       <div className="flex items-center gap-1.5">{children}</div>
     </div>
   );
@@ -161,14 +164,14 @@ function Row({ label, active, rowRef, children }) {
 function Btn({ focused, tone, children }) {
   const toneCls = tone === 'blood' ? 'text-blood' : tone === 'moss' ? 'text-moss' : 'text-sky';
   return (
-    <span className={['flex h-7 min-w-9 items-center justify-center rounded border-2 px-1 font-press text-[11px]', focused ? 'border-goldLight bg-gold/40' : 'border-bronze/50', toneCls].join(' ')}>
+    <span className={['flex h-7 min-w-9 items-center justify-center rounded border-2 px-1 font-press text-[11px]', focused ? 'border-goldLight bg-goldLight shadow-bevel' : 'border-bronze/50', toneCls].join(' ')}>
       {children}
     </span>
   );
 }
 
 function Bubble({ filled, focused, tone }) {
-  const fillCls = filled ? (tone === 'moss' ? 'bg-moss text-abyss' : 'bg-blood text-parchment') : 'bg-parchmentDark/40 text-bronze';
+  const fillCls = filled ? (tone === 'moss' ? 'bg-moss text-[#0c0a07]' : 'bg-blood text-[#e9d8b4]') : 'bg-parchmentDark/40 text-bronze';
   return (
     <span className={['flex h-6 w-6 items-center justify-center rounded-full border-2 text-sm', focused ? 'border-goldLight' : 'border-bronze/60', fillCls].join(' ')}>
       {filled ? '●' : '○'}

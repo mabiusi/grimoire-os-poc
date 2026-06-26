@@ -1,27 +1,22 @@
 // Grimoire OS — bitmaps de iconografía original (12×12 pixel-art).
-// Cada ícono es un array de filas; cada char = un píxel:
-//   '.' transparente · 'o' bronce · 'g' oro · 'G' oro claro · 'd' oscuro
-//   (acentos opcionales: 'b' blood · 'm' moss · 'a' arcane · 's' sky · 'p' parchment)
-// Render: <PixelIcon name="dice" size={16} />  (ver PixelIcon.jsx)
-
-export const ICON_COLORS = {
-  o: '#8a6d3b', g: '#d8a93a', G: '#f3d27a', d: '#1c1812',
-  b: '#9b2c2c', m: '#5a7d3a', a: '#7b6cc4', s: '#5aa9c4', p: '#e9d8b4', w: '#e9d8b4',
-  // variantes claras de acento (para condiciones sobre fondo oscuro)
-  B: '#cf5b5b', M: '#7faa4a', A: '#9a8cd8', S: '#82c4da',
-};
+// Cada ícono es un array de filas; cada char = un píxel. Char-set:
+//   '.' transparente · 'o' outline · 'g' cuerpo · 'G' brillo · 'd' sombra interna
+//   acentos semánticos de condición: 'b' blood · 'm' moss · 'a' arcane · 's' sky ·
+//   'p'/'w' pergamino (+ claros 'B/M/A/S' para fondo oscuro).
+// Los tonos o/g/G SIGUEN EL ACENTO del tema; el color real lo resuelve PixelIcon
+// (ver paletteFor en PixelIcon.jsx: normal vs engrave). Los semánticos no cambian.
 
 export const iconBitmaps = {
   // --- Apps / barra de título ---
-  scroll: ["............",".gggg..gggg.",".gooG..gooG.",".gGGGGGGGGGo",".oGGGGGGGGGo",".ogooooooGGo",".oGGGGGGGGGo",".ogoooooGGGo",".oGGGGGGGGGo",".gGGGGGGGGGo",".gooG..gooG.",".gggg..gggg."],
-  dice:   ["............","...gggggg...","..gGGGGGGg..",".gGGdGGdGGg.",".gGGGGGGGGg.",".gGGGGdGGGg.",".gGGdGGGGGg.",".gGGGGGGGGg.",".gGGGdGGdGg.","..gGGGGGGg..","...gggggg...","............"],
-  book:   ["............","..oo....oo..",".oGGo..oGGo.","oGGGGooGGGGo","oGgGGooGGgGo","oGGGGooGGGGo","oGgGGooGGgGo","oGGGGooGGGGo","oGgGGooGGgGo","oGGGGooGGGGo",".oooo..oooo.","............"],
-  sword:  ["..........G.",".........GGo","........GGG.",".......GGG..","......GGG...",".....GGG....","..o.GGG.....",".ogGGo......","..ogGo......","...ogo......","..o.go......",".....o......"],
-  castle: ["g.g.g.g.g.g.","gggggggggggg","g.gggggggg.g","g.gggggggg.g","gggggggggggg","gGGGgggGGGgg","gGGGgggGGGgg","ggggGGggggg.","ggggGGgggggg","ggggGGgggggg","gggggggggggg","oooooooooooo"],
+  scroll: ["............",".gGGGGGGGGg.","goGGGGGGGGog",".gGddddddGg.",".gGGGGGGGGg.",".gGddddddGg.",".gGGGGGGGGg.",".gGddddddGg.",".gGGGGGGGGg.","goGGGGGGGGog",".gGGGGGGGGg.","............"],
+  dice:   ["............","...gggggg...","..gGGGGGGo..",".gGGdGGdGGo.",".gGGGGGGGGo.",".gGGdGGGGGo.",".gGGGGGGdGo.",".gGGGdGGGGo.",".gGGGGGGGGo.","..oGGGGGGo..","...oooooo...","............"],
+  book:   ["............","..oo....oo..",".oGGo..oGGo.","oGGGGooGGGGo","oGddGooGddGo","oGGGGooGGGGo","oGddGooGddGo","oGGGGooGGGGo","oGddGooGddGo","oGGGGooGGGGo",".oGGGooGGGo.","..ooo..ooo.."],
+  sword:  ["..........gG",".........gGo","........gGo.",".......gGo..","......gGo...",".....gGo....","....gGo.....","..o.gG.o....",".oGoGoGo....","...ogo......","...ogo......","...ooo......"],
+  castle: ["g.g.g.g.g.g.","gggggggggggg","gGgggddgggGg","ggggggddgggg","gggggddddggg","ggggddooddgg","ggggdo..oddg","ggggdo..oddg","ggggdo..oddg","ggggdo..oddg","gggggggggggg","oooooooooooo"],
   plus:   ["............","....gggg....","....gGGg....","....gGGg....","gggggGGggggg","gGGGGGGGGGGg","gGGGGGGGGGGg","gggggGGggggg","....gGGg....","....gGGg....","....gggg....","............"],
 
   // --- Personajes ---
-  dragon: ["..o.......o.",".ogo.....ogo","oGGGoo.ooGGo","oGdGGoooGdGo","oGGGGGGGGGGo",".oGGGGGGGGo.","..oGGGGGGo..","..oGooooGo..",".oGo.oo.oGo.","oGo..oo..oGo","o....oo....o","............"],
+  dragon: ["o..........o",".o........o.",".go......og.",".ogoooooogo.","..gGGGGGGg..",".gGGGGGGGGg.","gGdGGGGGGdGg","gGGGGGGGGGGg","gGGoGGGGoGGg",".gGGGGGGGGg.","..ogGGGGgo..","...oo..oo..."],
   octopus:["...gggggg...","..gGGGGGGg..",".gGGGGGGGGg.",".gGdGGGGdGg.",".gGGGGGGGGg.",".gGGGGGGGGg.","..gGGGGGGg..",".g.g.gg.g.g.","g.g.g..g.g.g","g.g.g..g.g.g",".g...g..g.g.","............"],
   page:   [".ooooooo.o..",".oGGGGGoGo..",".oGGGGGoooo.",".oGoooGGGGo.",".oGGGGGGGGo.",".oGoooooGGo.",".oGGGGGGGGo.",".oGoooooGGo.",".oGGGGGGGGo.",".oGooooGGGo.",".oGGGGGGGGo.",".oooooooooo."],
   heart:  ["............",".gg.gg..gg..","gGGgGGggGGg.","gGGGGGGGGGGg","gGGGGGGGGGGg","oGGGGGGGGGGg",".oGGGGGGGGo.","..oGGGGGGo..","...oGGGGo...","....oGGo....",".....oo.....","............"],

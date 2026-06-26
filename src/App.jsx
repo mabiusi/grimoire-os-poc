@@ -4,6 +4,7 @@ import VirtualGamepad from './components/VirtualGamepad.jsx';
 import GlobalControls from './components/GlobalControls.jsx';
 import { InputProvider } from './context/InputContext.jsx';
 import { SCREENS, SystemProvider, useSystem } from './context/SystemContext.jsx';
+import { themeVars } from './lib/theme.js';
 
 import BootSequence from './screens/BootSequence.jsx';
 import MainLauncher from './screens/MainLauncher.jsx';
@@ -29,15 +30,18 @@ function ActiveScreen() {
 
 // Contenido de la pantalla del OS: app activa + capa global + filtro de tema.
 function OSRoot() {
-  const { theme, settings } = useSystem();
+  const { theme, accent, settings } = useSystem();
   const prefersReduced =
     typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const reduced = settings.motion === 'reduced' || (settings.motion === 'auto' && prefersReduced);
+  // El color vive en CSS variables (--gr-*) computadas de (modo × acento); la
+  // clase theme-day/night queda sólo para ajustes NO-color (sombra de titular).
   return (
     <div
-      className={`relative h-full w-full overflow-hidden ${theme === 'night' ? 'theme-night' : ''} ${
+      className={`relative h-full w-full overflow-hidden theme-${theme} ${
         reduced ? 'motion-reduced' : ''
       }`}
+      style={themeVars(theme, accent)}
     >
       <ActiveScreen />
       <GlobalControls />

@@ -30,45 +30,46 @@ body {
   text-rendering: optimizeSpeed;
 }
 
-/* Modo noche (P6): paleta real, sin hue-rotate. Atenúa apenas el chrome y
-   convierte los paneles de lectura de pergamino claro a oscuro-cálido
-   (menos fatiga, identidad intacta). */
-.theme-night {
-  filter: brightness(0.94);
-}
-.theme-night .bg-parchment {
-  background-color: #241d12 !important;
-}
-.theme-night .text-ink {
-  color: #d8c7a0 !important;
-}
-.theme-night .text-bronze {
-  color: #a98a4f !important;
-}
-.theme-night .border-gold {
-  border-color: #9c7b2e !important;
-}
-.theme-night [class*='bg-parchmentDark'] {
-  background-color: rgba(255, 255, 255, 0.05) !important;
-}
-/* Acentos sobre fondo oscuro: subir luminancia para mantener contraste. */
-.theme-night .text-blood {
-  color: #cf6b6b !important;
-}
-.theme-night .text-sky {
-  color: #7cc3da !important;
-}
-.theme-night .text-moss {
-  color: #84b15a !important;
+/* Sistema de tema (rediseño): el color vive en CSS variables --gr-* que el
+   kernel computa de (modo Día/Noche × acento) y setea en el contenedor raíz de
+   la pantalla (App/OSRoot + lib/theme.js). Acá sólo los DEFAULTS (Día · Oro),
+   para que los tokens resuelvan aunque algo se pinte fuera de la pantalla. */
+:root {
+  --gr-abyss: 227 212 170;
+  --gr-stoneDark: 206 184 130;
+  --gr-stone: 217 197 146;
+  --gr-bronze: 138 109 59;
+  --gr-gold: 216 169 58;
+  --gr-goldLight: 243 210 122;
+  --gr-parchment: 242 230 198;
+  --gr-parchmentDark: 229 214 172;
+  --gr-ink: 42 28 12;
+  --gr-blood: 155 44 44;
+  --gr-moss: 78 111 46;
+  --gr-sky: 47 125 156;
+  --gr-arcane: 95 81 160;
+  --gr-chromeText: 42 28 12;
+  --gr-chromeDim: 122 98 56;
+  --gr-label: 102 80 31;
+  --gr-advText: 42 28 12;
+  --gr-poolBg: 229 214 172;
+  --gr-accDim: 156 123 46;
+  --gr-borderDim: 138 109 59;
+  --gr-barBorder: #d8a93ab3;
+  --gr-parchInset: rgba(120, 80, 20, 0.16);
+  --gr-parchLine: rgba(138, 109, 59, 0.5);
+  --gr-border: #d8a93a;
 }
 
-/* Fade inferior de los paneles de lectura (P2/P7). Sigue el color del panel
-   para no dejar una neblina clara sobre el pergamino oscuro de noche. */
+/* Fade inferior de los paneles de lectura: sigue el color del pergamino del
+   tema (claro en Día, oscuro-cálido en Noche) sin overrides. */
 .parchment-fade {
-  background: linear-gradient(to top, #e9d8b4, rgba(233, 216, 180, 0));
+  background: linear-gradient(to top, rgb(var(--gr-parchment)), rgb(var(--gr-parchment) / 0));
 }
-.theme-night .parchment-fade {
-  background: linear-gradient(to top, #241d12, rgba(36, 29, 18, 0));
+
+/* Titulares: sombra dura en Noche; más suave en Día para no ensuciar texto oscuro. */
+.theme-day .text-pixel-shadow {
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.35);
 }
 
 /* ----------------------------------------------------------------------

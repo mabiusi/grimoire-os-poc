@@ -101,11 +101,11 @@ function LevelStep({ title, initial, onConfirm, onBack }) {
       <div className="flex h-full flex-col items-center justify-center p-4">
         <p className="mb-5 font-press text-[9px] text-gold/80">NIVEL INICIAL</p>
         <div className="flex items-center gap-6">
-          <span className={`font-press text-2xl ${level > 1 ? 'text-gold' : 'text-parchment/30'}`}>◀</span>
+          <span className={`font-press text-2xl ${level > 1 ? 'text-gold' : 'text-chromeText/30'}`}>◀</span>
           <span className="font-press text-6xl text-goldLight text-pixel-shadow">{level}</span>
-          <span className={`font-press text-2xl ${level < 20 ? 'text-gold' : 'text-parchment/30'}`}>▶</span>
+          <span className={`font-press text-2xl ${level < 20 ? 'text-gold' : 'text-chromeText/30'}`}>▶</span>
         </div>
-        <p className="mt-7 max-w-[80%] text-center font-vt text-lg text-parchment/70">
+        <p className="mt-7 max-w-[80%] text-center font-vt text-lg text-chromeText/70">
           {level > 1
             ? 'Se abrirá el asistente de subida para repartir PV, subclase y mejoras (ASI).'
             : 'Empezarás como aventurero de nivel 1.'}

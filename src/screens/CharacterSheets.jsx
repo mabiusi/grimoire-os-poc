@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import Frame from '../components/Frame.jsx';
 import Cursor from '../components/Cursor.jsx';
 import PixelIcon from '../components/PixelIcon.jsx';
+import Tabs from '../components/Tabs.jsx';
 import SpellTracker from '../components/SpellTracker.jsx';
 import CombatTracker from '../components/CombatTracker.jsx';
 import LevelUpWizard from '../components/LevelUpWizard.jsx';
@@ -11,6 +12,7 @@ import { useGrimoireStore } from '../store/useGrimoireStore.js';
 import { useGamepad } from '../hooks/useGamepad.js';
 import { sfx } from '../lib/sfx.js';
 import { clamp, wrapIndex } from '../lib/utils.js';
+import { focusRow } from '../lib/focus.js';
 import { STAT_KEYS, STAT_NAMES } from '../data/constants.js';
 import {
   abilityMod,
@@ -137,13 +139,13 @@ function Roster({ characters, onOpen, onCreate, onBack }) {
               <div
                 key={char.id}
                 ref={active ? activeRef : null}
-                className={['flex items-center gap-3 rounded border-2 px-3 py-2 transition-colors', active ? 'border-goldLight bg-gold text-ink shadow-bevel' : 'border-bronze/60 bg-stoneDark text-parchment/80'].join(' ')}
+                className={['flex items-center gap-3 rounded border-2 px-3 py-2 transition-colors', focusRow(active)].join(' ')}
               >
-                <Cursor visible={active} className={active ? 'text-ink' : ''} />
-                <PixelIcon name={cls ? 'dragon' : 'page'} size={22} mono={active} />
+                <Cursor visible={active} className={active ? 'text-[#2a1c0c]' : ''} />
+                <PixelIcon name={cls ? 'dragon' : 'page'} size={22} engrave={active} />
                 <div className="flex-1 leading-tight">
                   <div className="font-vt text-xl">{char.name}</div>
-                  <div className="font-vt text-body-sm text-bronze">
+                  <div className={`font-vt text-body-sm ${active ? 'text-[#3a2a14]' : 'text-bronze'}`}>
                     {race?.name} · {cls?.name} · Nivel {char.level}
                   </div>
                 </div>
@@ -154,10 +156,10 @@ function Roster({ characters, onOpen, onCreate, onBack }) {
 
           <div
             ref={onCreateRow ? activeRef : null}
-            className={['flex items-center gap-3 rounded border-2 border-dashed px-3 py-2', onCreateRow ? 'border-goldLight bg-gold text-ink shadow-bevel' : 'border-moss/60 text-moss'].join(' ')}
+            className={['flex items-center gap-3 rounded border-2 border-dashed px-3 py-2', onCreateRow ? focusRow(true) : 'border-moss/60 text-moss'].join(' ')}
           >
-            <Cursor visible={onCreateRow} className={onCreateRow ? 'text-ink' : ''} />
-            <PixelIcon name="plus" size={20} mono={onCreateRow} />
+            <Cursor visible={onCreateRow} className={onCreateRow ? 'text-[#2a1c0c]' : ''} />
+            <PixelIcon name="plus" size={20} engrave={onCreateRow} />
             <div className="font-press text-[10px]">Crear nuevo personaje</div>
           </div>
         </div>
@@ -222,15 +224,7 @@ function SheetViewer({ charId, onBack, onLevelUp }) {
     <Frame title={`${(classOf(char, db)?.name || 'PERSONAJE').toUpperCase()}`} icon="dragon" hints={[['L/R', 'Pestañas'], tab === 0 ? ['↑↓', 'Scroll'] : ['↑↓', 'Mover'], ['X', 'Subir niv'], ['B', 'Atrás']]}>
       <div className="flex h-full flex-col p-2">
         {/* Pestañas */}
-        <div className="mb-2 flex items-center gap-1">
-          <span className="px-1 font-press text-[10px] text-gold/70">L</span>
-          {TABS.map((label, i) => (
-            <div key={label} className={['flex-1 rounded-t border-b-2 px-1 py-1.5 text-center font-press text-hud-sm', i === tab ? 'border-goldLight bg-gold text-ink' : 'border-bronze/50 bg-stoneDark text-parchment/60'].join(' ')}>
-              {label}
-            </div>
-          ))}
-          <span className="px-1 font-press text-[10px] text-gold/70">R</span>
-        </div>
+        <Tabs tabs={TABS} active={tab} className="mb-2" />
 
         {/* Panel pergamino */}
         <div className="relative min-h-0 flex-1 overflow-hidden rounded border-2 border-gold bg-parchment text-ink shadow-[inset_0_0_30px_rgba(120,80,20,0.25)]">
@@ -270,7 +264,7 @@ function SheetViewer({ charId, onBack, onLevelUp }) {
           <div ref={scrollRef} onScroll={updateEdges} className="h-[calc(100%-7.6rem)] overflow-y-auto px-4 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {tab === 0 && <StatsTab char={char} db={db} />}
             {tab === 1 && <InventoryTab charId={charId} char={char} db={db} />}
-            {tab === 2 && (char.spells ? <SpellTracker charId={charId} /> : <EmptyState text="Esta clase no lanza conjuros." />)}
+            {tab === 2 && (char.spells ? <SpellTracker charId={charId} /> : <EmptyState title="SIN CONJUROS" text="Esta clase no canaliza magia arcana ni divina." />)}
             {tab === 3 && <CombatTracker charId={charId} />}
             <div className="h-2" />
           </div>
@@ -286,11 +280,14 @@ function SheetViewer({ charId, onBack, onLevelUp }) {
   );
 }
 
-function EmptyState({ text }) {
+function EmptyState({ title = 'SIN DATOS', icon = 'spell', text }) {
   return (
-    <div className="rounded border-2 border-dashed border-bronze/50 p-4 text-center font-vt text-lg text-bronze">
-      ✦ Sin datos ✦
-      <p className="mt-2 text-base leading-snug">{text}</p>
+    <div className="rounded border-2 border-dashed border-bronze/50 p-5 text-center">
+      <span className="opacity-60">
+        <PixelIcon name={icon} size={28} />
+      </span>
+      <p className="mt-2 font-press text-hud uppercase tracking-wider text-bronze">{title}</p>
+      <p className="mt-2 font-vt text-body-sm leading-snug text-bronze">{text}</p>
     </div>
   );
 }
@@ -299,7 +296,7 @@ function EmptyState({ text }) {
 function Inst({ label, value, sub, color }) {
   return (
     <div className="flex flex-col items-center justify-center rounded border border-bronze/40 bg-parchment px-1 py-1.5 shadow-[inset_0_-2px_0_rgba(0,0,0,.07)]">
-      <span className="font-press text-[8px] leading-none text-bronze">{label}</span>
+      <span className="font-press text-hud-xs leading-none text-bronze">{label}</span>
       <span className={`mt-1 font-press text-[17px] leading-none ${color}`}>{value}</span>
       <span className="font-vt text-[13px] leading-none text-bronze/70">{sub || ' '}</span>
     </div>
@@ -391,8 +388,9 @@ function InventoryTab({ charId, char, db }) {
             <li
               key={slot.itemId}
               ref={active ? activeRef : null}
-              className={['flex items-center gap-2 rounded px-2 py-1 font-vt text-lg', active ? 'bg-gold/30' : ''].join(' ')}
+              className={['flex items-center gap-2 rounded border-2 px-2 py-1 font-vt text-lg', focusRow(active, { onParch: true })].join(' ')}
             >
+              <Cursor visible={active} className={active ? 'text-[#2a1c0c]' : ''} />
               <span className={can ? (slot.equipped ? 'text-moss' : 'text-bronze/50') : 'text-transparent'}>{slot.equipped ? '☑' : '☐'}</span>
               <span className="flex-1">{item?.name}</span>
               <span className="text-bronze">{item?.note}</span>

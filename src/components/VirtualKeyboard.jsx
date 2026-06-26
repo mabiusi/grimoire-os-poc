@@ -123,10 +123,10 @@ export default function VirtualKeyboard({
         {/* Display del texto */}
         <div className="mb-3 flex w-full items-center justify-between rounded border-2 border-gold bg-stoneDark px-3 py-2">
           <span className="font-vt text-2xl text-goldLight">
-            {text || <span className="text-parchment/40">Escribe un nombre…</span>}
+            {text || <span className="text-chromeText/40">Escribe un nombre…</span>}
             <span className="animate-blink text-gold">▏</span>
           </span>
-          <span className="font-press text-[8px] text-gold/60">
+          <span className="font-press text-hud-xs text-gold/60">
             {text.length}/{maxLength}
           </span>
         </div>
@@ -143,8 +143,8 @@ export default function VirtualKeyboard({
                     className={[
                       'flex h-9 w-9 items-center justify-center rounded border-2 font-press text-sm',
                       active
-                        ? 'border-goldLight bg-gold text-ink shadow-bevel'
-                        : 'border-bronze/50 bg-stoneDark text-parchment/85',
+                        ? 'border-goldLight bg-gold text-[#2a1c0c] shadow-bevel'
+                        : 'border-bronze/50 bg-stoneDark text-chromeText/85',
                     ].join(' ')}
                   >
                     {ch}
@@ -166,10 +166,10 @@ export default function VirtualKeyboard({
                     grow,
                     'flex h-9 items-center justify-center rounded border-2 font-press text-[10px]',
                     active
-                      ? 'border-goldLight bg-gold text-ink shadow-bevel'
+                      ? 'border-goldLight bg-gold text-[#2a1c0c] shadow-bevel'
                       : a.id === 'ok'
                       ? 'border-moss/70 bg-stoneDark text-moss'
-                      : 'border-bronze/50 bg-stoneDark text-parchment/85',
+                      : 'border-bronze/50 bg-stoneDark text-chromeText/85',
                   ].join(' ')}
                 >
                   {a.label}
@@ -179,9 +179,9 @@ export default function VirtualKeyboard({
           </div>
         </div>
 
-        <p className="mt-3 font-vt text-base text-parchment/50">
+        <p className="mt-3 font-vt text-base text-chromeText/50">
           <kbd className="rounded-sm bg-moss px-1.5 text-abyss">Y</kbd> /{' '}
-          <kbd className="rounded-sm bg-gold px-1.5 text-ink">Sel</kbd> alterna Mayúsculas
+          <kbd className="rounded-sm bg-gold px-1.5 text-[#2a1c0c]">Sel</kbd> alterna Mayúsculas
         </p>
       </div>
     </Frame>

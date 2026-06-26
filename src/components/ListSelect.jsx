@@ -59,16 +59,16 @@ export default function ListSelect({ title, icon, prompt, items, initialId, onCo
                 className={[
                   'rounded border-2 px-3 py-2 transition-colors',
                   active
-                    ? 'border-goldLight bg-gold text-ink shadow-bevel'
-                    : 'border-bronze/60 bg-stoneDark text-parchment/80',
+                    ? 'border-goldLight bg-gold text-[#2a1c0c] shadow-bevel'
+                    : 'border-bronze/60 bg-stoneDark text-chromeText/80',
                 ].join(' ')}
               >
                 <div className="flex items-center gap-2">
-                  <Cursor visible={active} className={active ? 'text-ink' : ''} />
+                  <Cursor visible={active} className={active ? 'text-[#2a1c0c]' : ''} />
                   <span className="font-press text-[11px]">{it.name}</span>
                 </div>
                 {it.desc && (
-                  <p className={`ml-6 font-vt text-base leading-tight ${active ? 'text-ink/80' : 'text-parchment/55'}`}>
+                  <p className={`ml-6 font-vt text-base leading-tight ${active ? 'text-[#2a1c0c]/80' : 'text-chromeText/55'}`}>
                     {it.desc}
                   </p>
                 )}
