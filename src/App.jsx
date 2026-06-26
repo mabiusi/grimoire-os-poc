@@ -78,15 +78,16 @@ function Shell() {
   if (mode === 'mobile') {
     return (
       <div className="flex w-screen select-none flex-col bg-black" style={{ height: '100dvh' }}>
-        {/* Pantalla anclada arriba, escalada al ancho */}
-        <div className="w-full shrink-0" style={{ height: '75vw', maxHeight: '60vh' }}>
+        {/* Pantalla anclada arriba, escalada al ancho (4:3) */}
+        <div className="w-full shrink-0" style={{ height: 'min(75vw, 54vh)' }}>
           <Device>
             <OSRoot />
           </Device>
         </div>
-        {/* Cuerpo de la consola */}
-        <div className="min-h-0 flex-1 bg-gradient-to-b from-black to-stoneDark/60" />
-        <VirtualGamepad />
+        {/* Mando táctil: ocupa TODO el cuerpo restante (sin espaciador muerto) */}
+        <div className="min-h-0 flex-1">
+          <VirtualGamepad />
+        </div>
       </div>
     );
   }
