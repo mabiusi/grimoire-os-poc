@@ -29,9 +29,16 @@ function ActiveScreen() {
 
 // Contenido de la pantalla del OS: app activa + capa global + filtro de tema.
 function OSRoot() {
-  const { theme } = useSystem();
+  const { theme, settings } = useSystem();
+  const prefersReduced =
+    typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  const reduced = settings.motion === 'reduced' || (settings.motion === 'auto' && prefersReduced);
   return (
-    <div className={`relative h-full w-full overflow-hidden ${theme === 'night' ? 'theme-night' : ''}`}>
+    <div
+      className={`relative h-full w-full overflow-hidden ${theme === 'night' ? 'theme-night' : ''} ${
+        reduced ? 'motion-reduced' : ''
+      }`}
+    >
       <ActiveScreen />
       <GlobalControls />
     </div>

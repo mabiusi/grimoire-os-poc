@@ -30,9 +30,45 @@ body {
   text-rendering: optimizeSpeed;
 }
 
-/* Modo noche: filtro frío y atenuado sobre la interfaz del OS (Select). */
+/* Modo noche (P6): paleta real, sin hue-rotate. Atenúa apenas el chrome y
+   convierte los paneles de lectura de pergamino claro a oscuro-cálido
+   (menos fatiga, identidad intacta). */
 .theme-night {
-  filter: brightness(0.82) saturate(0.8) hue-rotate(200deg) contrast(1.05);
+  filter: brightness(0.94);
+}
+.theme-night .bg-parchment {
+  background-color: #241d12 !important;
+}
+.theme-night .text-ink {
+  color: #d8c7a0 !important;
+}
+.theme-night .text-bronze {
+  color: #a98a4f !important;
+}
+.theme-night .border-gold {
+  border-color: #9c7b2e !important;
+}
+.theme-night [class*='bg-parchmentDark'] {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+/* Acentos sobre fondo oscuro: subir luminancia para mantener contraste. */
+.theme-night .text-blood {
+  color: #cf6b6b !important;
+}
+.theme-night .text-sky {
+  color: #7cc3da !important;
+}
+.theme-night .text-moss {
+  color: #84b15a !important;
+}
+
+/* Fade inferior de los paneles de lectura (P2/P7). Sigue el color del panel
+   para no dejar una neblina clara sobre el pergamino oscuro de noche. */
+.parchment-fade {
+  background: linear-gradient(to top, #e9d8b4, rgba(233, 216, 180, 0));
+}
+.theme-night .parchment-fade {
+  background: linear-gradient(to top, #241d12, rgba(36, 29, 18, 0));
 }
 
 /* ----------------------------------------------------------------------
@@ -77,6 +113,17 @@ body {
 .animate-softpulse { animation: gr-softpulse 0.9s ease-in-out infinite; }
 .animate-shake { animation: gr-shake 0.09s linear infinite; }
 .animate-popin { animation: gr-popin 0.18s steps(4, end); }
+
+/* P6: movimiento reducido. La clase la aplica App según el ajuste del usuario
+   (auto/reducido/completo) + prefers-reduced-motion del SO. Cada animación
+   tiene su estado quieto equivalente sin perder información. */
+.motion-reduced .animate-blink,
+.motion-reduced .animate-softpulse,
+.motion-reduced .animate-shake,
+.motion-reduced .animate-diceglow,
+.motion-reduced .animate-popin,
+.motion-reduced .crt { animation: none !important; }
+.motion-reduced .crt-glow::before { display: none !important; }
 
 /* ----------------------------------------------------------------------
    Efectos CRT del marco de la consola

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import PixelIcon from '../components/PixelIcon.jsx';
 import { SCREENS, useSystem } from '../context/SystemContext.jsx';
 import { useGamepad } from '../hooks/useGamepad.js';
 import { useGrimoireStore } from '../store/useGrimoireStore.js';
@@ -101,7 +102,10 @@ export default function BootSequence() {
       ) : (
         // Logo final antes de entrar al menú.
         <div className="flex flex-1 animate-popin flex-col items-center justify-center text-center">
-          <div className="text-5xl">📖✦</div>
+          <div className="flex items-center justify-center gap-2">
+            <PixelIcon name="book" size={44} />
+            <PixelIcon name="spark" size={28} />
+          </div>
           <h1 className="mt-4 font-press text-2xl leading-relaxed text-goldLight text-pixel-shadow">
             GRIMOIRE
             <br />

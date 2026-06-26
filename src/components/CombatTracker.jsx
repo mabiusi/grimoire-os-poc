@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import PixelIcon from './PixelIcon.jsx';
 import { useGrimoireStore } from '../store/useGrimoireStore.js';
 import { useGamepad } from '../hooks/useGamepad.js';
 import { sfx } from '../lib/sfx.js';
@@ -127,7 +128,7 @@ export default function CombatTracker({ charId }) {
       </Row>
 
       {/* Condiciones */}
-      <h3 className="mb-1 mt-3 border-b-2 border-gold font-press text-[9px] uppercase text-bronze">Condiciones · [A] alternar</h3>
+      <h3 className="mb-1 mt-3 border-b-2 border-gold font-press text-hud-sm uppercase text-bronze">Condiciones · [A] alternar</h3>
       {db.conditions.map((cond, i) => {
         const rowIdx = rows.findIndex((r) => r.type === 'cond') + i;
         const active = activeIdx === rowIdx;
@@ -135,7 +136,7 @@ export default function CombatTracker({ charId }) {
         return (
           <div key={cond.id} ref={active ? activeRef : null} className={`flex items-center gap-2 rounded px-2 py-0.5 text-lg ${active ? 'bg-gold/30' : ''}`}>
             <span className={on ? 'text-blood' : 'text-bronze/40'}>{on ? '☑' : '☐'}</span>
-            <span>{cond.icon}</span>
+            <PixelIcon name={`cond_${cond.id}`} size={16} title={cond.name} />
             <span className={on ? 'font-semibold' : ''}>{cond.name}</span>
           </div>
         );

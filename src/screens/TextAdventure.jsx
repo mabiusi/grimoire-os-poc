@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Frame from '../components/Frame.jsx';
 import Cursor from '../components/Cursor.jsx';
+import PixelIcon from '../components/PixelIcon.jsx';
 import { useSystem } from '../context/SystemContext.jsx';
 import { useGamepad } from '../hooks/useGamepad.js';
 import { sfx } from '../lib/sfx.js';
@@ -46,7 +47,7 @@ export default function TextAdventure() {
   return (
     <Frame
       title="AVENTURA DE TEXTO"
-      icon="🗡️"
+      icon="sword"
       hints={[
         ['↑↓', 'Elegir'],
         ['A', 'Confirmar'],
@@ -60,11 +61,14 @@ export default function TextAdventure() {
           {ending ? node.title : `» ${node.title}`}
         </div>
 
-        {/* Narrativa */}
-        <div className="flex-1 overflow-hidden text-[22px] leading-snug text-goldLight">
-          <span className="text-moss">&gt; </span>
-          {node.text}
-          {!ending && <span className="animate-blink text-goldLight">▋</span>}
+        {/* Narrativa — scrolleable, con fade inferior (sin recorte mudo) */}
+        <div className="relative flex-1 overflow-hidden">
+          <div className="h-full overflow-y-auto text-[22px] leading-snug text-goldLight [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <span className="text-moss">&gt; </span>
+            {node.text}
+            {!ending && <span className="animate-blink text-goldLight">▋</span>}
+          </div>
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6" style={{ background: 'linear-gradient(to top,#0c0a07,rgba(12,10,7,0))' }} />
         </div>
 
         {/* Banner de final */}
@@ -77,7 +81,11 @@ export default function TextAdventure() {
                 : 'border-blood text-blood',
             ].join(' ')}
           >
-            {ending === 'good' ? '✦ HAS SOBREVIVIDO ✦' : '☠ FIN DEL CAMINO ☠'}
+            <span className="flex items-center justify-center gap-2">
+              <PixelIcon name={ending === 'good' ? 'spark' : 'skull'} size={14} />
+              {ending === 'good' ? 'HAS SOBREVIVIDO' : 'FIN DEL CAMINO'}
+              <PixelIcon name={ending === 'good' ? 'spark' : 'skull'} size={14} />
+            </span>
           </div>
         )}
 

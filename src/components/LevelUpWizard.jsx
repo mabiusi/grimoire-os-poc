@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import Frame from './Frame.jsx';
 import Cursor from './Cursor.jsx';
+import PixelIcon from './PixelIcon.jsx';
 import ListSelect from './ListSelect.jsx';
 import { useGrimoireStore } from '../store/useGrimoireStore.js';
+import { useSystem } from '../context/SystemContext.jsx';
 import { useGamepad } from '../hooks/useGamepad.js';
 import { sfx } from '../lib/sfx.js';
-import { rollDie, wrapIndex } from '../lib/utils.js';
+import { rollDie, wrapIndex, isReducedMotion } from '../lib/utils.js';
 import { STAT_KEYS, STAT_NAMES } from '../data/constants.js';
 import { abilityMod, fmtMod, classOf } from '../store/derive.js';
 import { planLevelUp, gainHp, setSubclass, applyAsi, finalizeLevel, hitDieAverage } from '../store/levelup.js';
@@ -49,7 +51,7 @@ export default function LevelUpWizard({ char, targetLevel, onComplete, onCancel 
       <ListSelect
         key={stepIndex}
         title={`SUBIR · SUBCLASE (Nv ${step.level})`}
-        icon="🎖️"
+        icon="medal"
         prompt="ELIGE TU SUBCLASE"
         items={items}
         onConfirm={(id) => advance(setSubclass(working, id))}
@@ -62,6 +64,7 @@ export default function LevelUpWizard({ char, targetLevel, onComplete, onCancel 
 
 /* ----- Paso: Puntos de Vida (tirar dado o promedio) ------------------ */
 function HpStep({ working, step, progress, onResult, onCancel }) {
+  const { settings } = useSystem();
   const { hitDie } = step;
   const avg = hitDieAverage(hitDie);
   const conMod = abilityMod(working.abilities.CON);
@@ -74,12 +77,20 @@ function HpStep({ working, step, progress, onResult, onCancel }) {
   useEffect(() => () => { clearInterval(timers.current.i); clearTimeout(timers.current.t); }, []);
 
   const startRoll = () => {
-    setMode('rolling');
     sfx.open();
+    const r = rollDie(hitDie);
+    // Movimiento reducido: sin ruleta, se asienta directo en el resultado.
+    if (isReducedMotion(settings.motion)) {
+      setDisplay(r);
+      setRoll(r);
+      setMode('rolled');
+      sfx.result();
+      return;
+    }
+    setMode('rolling');
     timers.current.i = setInterval(() => { setDisplay(rollDie(hitDie)); sfx.roll(); }, 60);
     timers.current.t = setTimeout(() => {
       clearInterval(timers.current.i);
-      const r = rollDie(hitDie);
       setDisplay(r);
       setRoll(r);
       setMode('rolled');
@@ -108,7 +119,7 @@ function HpStep({ working, step, progress, onResult, onCancel }) {
       : [['←→', 'Opción'], ['A', 'Elegir'], ['B', 'Cancelar']];
 
   return (
-    <Frame title="SUBIR DE NIVEL · PV" icon="❤️" hints={hints}>
+    <Frame title="SUBIR DE NIVEL · PV" icon="heart" hints={hints}>
       <div className="flex h-full flex-col items-center justify-center p-4">
         <p className="mb-1 font-press text-[9px] text-gold/80">{progress}</p>
         <p className="mb-4 font-vt text-xl text-goldLight">
@@ -117,7 +128,7 @@ function HpStep({ working, step, progress, onResult, onCancel }) {
 
         {mode === 'choose' ? (
           <div className="flex gap-4">
-            <Choice focused={sel === 0} title={`🎲 Tirar d${hitDie}`} note="Al azar" />
+            <Choice focused={sel === 0} icon="dice" title={`Tirar d${hitDie}`} note="Al azar" />
             <Choice focused={sel === 1} title={`Promedio ${avg}`} note={`= +${Math.max(1, avg + conMod)} PV`} />
           </div>
         ) : (
@@ -137,10 +148,13 @@ function HpStep({ working, step, progress, onResult, onCancel }) {
   );
 }
 
-function Choice({ focused, title, note }) {
+function Choice({ focused, icon, title, note }) {
   return (
     <div className={['flex w-40 flex-col items-center rounded-lg border-2 px-3 py-4 font-press', focused ? 'border-goldLight bg-gold text-ink shadow-bevel' : 'border-bronze/60 bg-stoneDark text-parchment/80'].join(' ')}>
-      <span className="text-[11px]">{title}</span>
+      <span className="flex items-center gap-1.5 text-[11px]">
+        {icon && <PixelIcon name={icon} size={14} mono={focused} />}
+        {title}
+      </span>
       <span className="mt-2 font-vt text-base opacity-80">{note}</span>
     </div>
   );
@@ -180,7 +194,7 @@ function AsiStep({ working, progress, onResult, onCancel }) {
   });
 
   return (
-    <Frame title="SUBIR DE NIVEL · MEJORA" icon="💪" hints={[['↑↓', 'Stat'], ['←→', '-/+'], ['A', 'Guardar'], ['B', 'Cancelar']]}>
+    <Frame title="SUBIR DE NIVEL · MEJORA" icon="boostup" hints={[['↑↓', 'Stat'], ['←→', '-/+'], ['A', 'Guardar'], ['B', 'Cancelar']]}>
       <div className="flex h-full flex-col p-3">
         <div className="mb-2 flex items-center justify-between rounded border-2 border-bronze bg-stoneDark px-3 py-1.5">
           <span className="font-vt text-lg text-goldLight">{progress}</span>

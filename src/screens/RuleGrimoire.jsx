@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Frame from '../components/Frame.jsx';
 import Cursor from '../components/Cursor.jsx';
+import PixelIcon from '../components/PixelIcon.jsx';
 import GrimoireTextRenderer from '../components/GrimoireTextRenderer.jsx';
 import { useSystem } from '../context/SystemContext.jsx';
 import { useGrimoireStore } from '../store/useGrimoireStore.js';
@@ -31,13 +32,13 @@ export default function RuleGrimoire() {
 
   const hints =
     tab === 0
-      ? [['←→', 'Página'], ['L/R', 'Sección'], ['B', 'Salir']]
+      ? [['↑↓', 'Scroll'], ['A', 'Página'], ['L/R', 'Sección'], ['B', 'Salir']]
       : [['↑↓', 'Mover'], ['A', 'Ver'], ['L/R', 'Sección'], ['B', 'Atrás']];
 
   const exit = () => { sfx.back(); goBack(); };
 
   return (
-    <Frame title="GRIMORIO DE REGLAS" icon="📖" hints={hints}>
+    <Frame title="GRIMORIO DE REGLAS" icon="book" hints={hints}>
       <div className="flex h-full flex-col p-2">
         {/* Pestañas (L/R) */}
         <div className="mb-2 flex items-center gap-1">
@@ -46,7 +47,7 @@ export default function RuleGrimoire() {
             <div
               key={label}
               className={[
-                'flex-1 rounded-t border-b-2 px-2 py-1 text-center font-press text-[9px]',
+                'flex-1 rounded-t border-b-2 px-2 py-1.5 text-center font-press text-hud-sm',
                 i === tab ? 'border-goldLight bg-gold text-ink' : 'border-bronze/50 bg-stoneDark text-parchment/60',
               ].join(' ')}
             >
@@ -69,30 +70,47 @@ export default function RuleGrimoire() {
  * ===================================================================== */
 function FlashcardsReader({ onBack }) {
   const [page, setPage] = useState(0);
+  const scrollRef = useRef(null);
+  const [atBottom, setAtBottom] = useState(true);
   const total = RULE_PAGES.length;
   const current = RULE_PAGES[page];
 
+  const updateEdges = () => {
+    const el = scrollRef.current;
+    if (el) setAtBottom(el.scrollTop + el.clientHeight >= el.scrollHeight - 1);
+  };
+  useEffect(() => { if (scrollRef.current) scrollRef.current.scrollTop = 0; updateEdges(); }, [page]);
+
   const next = () => (page < total - 1 ? (sfx.page(), setPage(page + 1)) : sfx.error());
   const prev = () => (page > 0 ? (sfx.page(), setPage(page - 1)) : sfx.error());
+  const scroll = (d) => { const el = scrollRef.current; if (el) { el.scrollTop += d; updateEdges(); sfx.move(); } };
 
-  useGamepad({ onA: next, onRight: next, onLeft: prev, onB: onBack });
+  // ↑↓ hacen scroll del texto; A / ←→ pasan de página.
+  useGamepad({ onUp: () => scroll(-56), onDown: () => scroll(56), onA: next, onRight: next, onLeft: prev, onB: onBack });
 
   const isLast = page === total - 1;
 
   return (
     <div className="flex h-full flex-col rounded border-2 border-gold bg-parchment text-ink shadow-[inset_0_0_30px_rgba(120,80,20,0.25)]">
       <div className="flex items-center justify-between border-b-2 border-gold px-4 py-2">
-        <h2 className="font-press text-[12px] text-blood">{current.title}</h2>
-        <span className="font-press text-[9px] text-bronze">Pág. {page + 1}/{total}</span>
+        <h2 className="font-press text-hud text-blood">{current.title}</h2>
+        <span className="font-press text-hud-xs text-bronze">Pág. {page + 1}/{total}</span>
       </div>
 
-      <div className="flex-1 overflow-hidden px-5 py-3 font-vt text-[21px] leading-snug">
-        {current.lines.map((line, i) => (
-          <p key={i} className={line === '' ? 'h-3' : 'text-ink'}>{line}</p>
-        ))}
+      <div className="relative flex-1 overflow-hidden">
+        <div
+          ref={scrollRef}
+          onScroll={updateEdges}
+          className="h-full overflow-y-auto px-5 py-3 font-vt text-[21px] leading-snug [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {current.lines.map((line, i) => (
+            <p key={i} className={line === '' ? 'h-3' : 'text-ink'}>{line}</p>
+          ))}
+        </div>
+        {!atBottom && <div className="parchment-fade pointer-events-none absolute inset-x-0 bottom-0 h-7" />}
       </div>
 
-      <div className="flex items-center justify-between border-t-2 border-gold px-4 py-2 font-press text-[9px] text-bronze">
+      <div className="flex items-center justify-between border-t-2 border-gold px-4 py-2 font-press text-hud-xs text-bronze">
         <span className={page > 0 ? 'text-blood' : 'opacity-30'}>◀ ANT.</span>
         <div className="flex gap-1">
           {RULE_PAGES.map((_, i) => (
@@ -112,7 +130,7 @@ const CATEGORIES = [
   {
     id: 'races',
     name: 'Especies',
-    icon: '🧝',
+    icon: 'race',
     get: (db) => db.races,
     sub: (r) => `${r.speed} m`,
     detail: (r) => ({
@@ -124,7 +142,7 @@ const CATEGORIES = [
   {
     id: 'classes',
     name: 'Clases',
-    icon: '⚔️',
+    icon: 'classsw',
     get: (db) => db.classes,
     sub: (c) => `d${c.hitDie}`,
     detail: (c) => ({
@@ -142,7 +160,7 @@ const CATEGORIES = [
   {
     id: 'spells',
     name: 'Hechizos',
-    icon: '✨',
+    icon: 'spell',
     get: (db) => db.spells,
     sub: (s) => (s.level === 0 ? 'Truco' : `Nv ${s.level}`),
     detail: (s) => ({
@@ -154,7 +172,7 @@ const CATEGORIES = [
   {
     id: 'bestiary',
     name: 'Bestiario',
-    icon: '🐲',
+    icon: 'beast',
     get: (db) => db.bestiary,
     sub: (b) => `VD ${b.cr}`,
     detail: (b) => ({
@@ -215,7 +233,7 @@ function Encyclopedia({ onBack }) {
             return (
               <div key={cat.id} ref={active ? listRef : null} className={['flex items-center gap-3 rounded border-2 px-3 py-2', active ? 'border-goldLight bg-gold text-ink shadow-bevel' : 'border-bronze/60 bg-stoneDark text-parchment/80'].join(' ')}>
                 <Cursor visible={active} className={active ? 'text-ink' : ''} />
-                <span className="text-2xl">{cat.icon}</span>
+                <PixelIcon name={cat.icon} size={20} mono={active} />
                 <span className="flex-1 font-press text-[11px]">{cat.name}</span>
                 <span className="font-vt text-lg opacity-70">{cat.get(db).length}</span>
               </div>
@@ -229,7 +247,9 @@ function Encyclopedia({ onBack }) {
   if (phase === 'items') {
     return (
       <div className="flex h-full flex-col">
-        <p className="mb-2 font-press text-[9px] text-gold/80">{category.icon} {category.name.toUpperCase()}</p>
+        <p className="mb-2 flex items-center gap-1.5 font-press text-[9px] text-gold/80">
+          <PixelIcon name={category.icon} size={14} /> {category.name.toUpperCase()}
+        </p>
         <div className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {items.map((it, i) => {
             const active = i === itemIndex;

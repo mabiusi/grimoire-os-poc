@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Frame from '../components/Frame.jsx';
 import Cursor from '../components/Cursor.jsx';
+import PixelIcon from '../components/PixelIcon.jsx';
 import SpellTracker from '../components/SpellTracker.jsx';
 import CombatTracker from '../components/CombatTracker.jsx';
 import LevelUpWizard from '../components/LevelUpWizard.jsx';
@@ -26,7 +27,6 @@ import {
   itemOf,
 } from '../store/derive.js';
 
-const ACCENT = { blood: 'text-blood', arcane: 'text-arcane', sky: 'text-sky', moss: 'text-moss', gold: 'text-bronze', parchment: 'text-ink' };
 const TABS = ['Stats', 'Inventario', 'Magia', 'Combate'];
 const SCROLL_STEP = 64;
 
@@ -123,7 +123,7 @@ function Roster({ characters, onOpen, onCreate, onBack }) {
   });
 
   return (
-    <Frame title="HOJAS DE PERSONAJE" icon="📜" hints={[['↑↓', 'Elegir'], ['A', 'Abrir'], ['B', 'Atrás']]}>
+    <Frame title="HOJAS DE PERSONAJE" icon="scroll" hints={[['↑↓', 'Elegir'], ['A', 'Abrir'], ['B', 'Atrás']]}>
       <div className="flex h-full flex-col p-3">
         <p className="mb-2 font-press text-[9px] text-gold/80">
           TUS PERSONAJES <span className="text-gold/50">({characters.length})</span>
@@ -140,11 +140,11 @@ function Roster({ characters, onOpen, onCreate, onBack }) {
                 className={['flex items-center gap-3 rounded border-2 px-3 py-2 transition-colors', active ? 'border-goldLight bg-gold text-ink shadow-bevel' : 'border-bronze/60 bg-stoneDark text-parchment/80'].join(' ')}
               >
                 <Cursor visible={active} className={active ? 'text-ink' : ''} />
-                <span className="text-2xl">{cls ? '🐉' : '📄'}</span>
+                <PixelIcon name={cls ? 'dragon' : 'page'} size={22} mono={active} />
                 <div className="flex-1 leading-tight">
                   <div className="font-vt text-xl">{char.name}</div>
-                  <div className="font-press text-[7px] opacity-70">
-                    {race?.name} {cls?.name} · Nv {char.level}
+                  <div className="font-vt text-body-sm text-bronze">
+                    {race?.name} · {cls?.name} · Nivel {char.level}
                   </div>
                 </div>
                 <ConditionIcons ids={char.conditions} db={db} />
@@ -157,7 +157,7 @@ function Roster({ characters, onOpen, onCreate, onBack }) {
             className={['flex items-center gap-3 rounded border-2 border-dashed px-3 py-2', onCreateRow ? 'border-goldLight bg-gold text-ink shadow-bevel' : 'border-moss/60 text-moss'].join(' ')}
           >
             <Cursor visible={onCreateRow} className={onCreateRow ? 'text-ink' : ''} />
-            <span className="text-2xl">＋</span>
+            <PixelIcon name="plus" size={20} mono={onCreateRow} />
             <div className="font-press text-[10px]">Crear nuevo personaje</div>
           </div>
         </div>
@@ -172,7 +172,7 @@ function ConditionIcons({ ids, db }) {
     <span className="flex gap-0.5 text-base" title="condiciones activas">
       {ids.map((id) => {
         const c = db.conditions.find((x) => x.id === id);
-        return c ? <span key={id}>{c.icon}</span> : null;
+        return c ? <PixelIcon key={id} name={`cond_${c.id}`} size={14} title={c.name} /> : null;
       })}
     </span>
   );
@@ -185,12 +185,18 @@ function SheetViewer({ charId, onBack, onLevelUp }) {
   const db = useGrimoireStore((s) => s.db);
   const scrollRef = useRef(null);
   const [tab, setTab] = useState(0);
-  const [edges, setEdges] = useState({ top: true, bottom: false });
+  const [edges, setEdges] = useState({ top: true, bottom: false, scrollTop: 0, scrollH: 1, clientH: 1 });
 
   const updateEdges = () => {
     const el = scrollRef.current;
     if (!el) return;
-    setEdges({ top: el.scrollTop <= 1, bottom: el.scrollTop + el.clientHeight >= el.scrollHeight - 1 });
+    setEdges({
+      top: el.scrollTop <= 1,
+      bottom: el.scrollTop + el.clientHeight >= el.scrollHeight - 1,
+      scrollTop: el.scrollTop,
+      scrollH: el.scrollHeight,
+      clientH: el.clientHeight,
+    });
   };
   useEffect(() => { if (scrollRef.current) scrollRef.current.scrollTop = 0; updateEdges(); }, [tab]);
 
@@ -208,15 +214,18 @@ function SheetViewer({ charId, onBack, onLevelUp }) {
 
   if (!char) return null;
   const ac = deriveAC(char, db);
+  // Thumb del riel de scroll (proporción y posición clampeada dentro del riel).
+  const railH = Math.max(12, (edges.clientH / edges.scrollH) * 100);
+  const railTop = Math.min(100 - railH, Math.max(0, (edges.scrollTop / edges.scrollH) * 100));
 
   return (
-    <Frame title={`${(classOf(char, db)?.name || 'PERSONAJE').toUpperCase()}`} icon="🐉" hints={[['L/R', 'Pestañas'], tab === 0 ? ['↑↓', 'Scroll'] : ['↑↓', 'Mover'], ['X', 'Subir niv'], ['B', 'Atrás']]}>
+    <Frame title={`${(classOf(char, db)?.name || 'PERSONAJE').toUpperCase()}`} icon="dragon" hints={[['L/R', 'Pestañas'], tab === 0 ? ['↑↓', 'Scroll'] : ['↑↓', 'Mover'], ['X', 'Subir niv'], ['B', 'Atrás']]}>
       <div className="flex h-full flex-col p-2">
         {/* Pestañas */}
         <div className="mb-2 flex items-center gap-1">
           <span className="px-1 font-press text-[10px] text-gold/70">L</span>
           {TABS.map((label, i) => (
-            <div key={label} className={['flex-1 rounded-t border-b-2 px-1 py-1 text-center font-press text-[8px]', i === tab ? 'border-goldLight bg-gold text-ink' : 'border-bronze/50 bg-stoneDark text-parchment/60'].join(' ')}>
+            <div key={label} className={['flex-1 rounded-t border-b-2 px-1 py-1.5 text-center font-press text-hud-sm', i === tab ? 'border-goldLight bg-gold text-ink' : 'border-bronze/50 bg-stoneDark text-parchment/60'].join(' ')}>
               {label}
             </div>
           ))}
@@ -225,24 +234,40 @@ function SheetViewer({ charId, onBack, onLevelUp }) {
 
         {/* Panel pergamino */}
         <div className="relative min-h-0 flex-1 overflow-hidden rounded border-2 border-gold bg-parchment text-ink shadow-[inset_0_0_30px_rgba(120,80,20,0.25)]">
-          {/* Cabecera con AC/HP vivos + condiciones */}
-          <div className="flex items-center justify-between border-b-2 border-gold px-4 py-2">
-            <div>
-              <h2 className="flex items-center gap-2 font-press text-[12px] leading-relaxed text-blood">
+          {/* Cabecera: identidad compacta + badge de datos fijos */}
+          <div className="flex items-center justify-between border-b border-gold/60 px-4 pt-2 pb-1.5">
+            <div className="min-w-0">
+              <h2 className="flex items-center gap-2 font-press text-hud leading-relaxed text-blood">
                 {char.name}
-                <span className="flex gap-0.5 text-sm">
-                  {char.conditions.map((id) => { const c = db.conditions.find((x) => x.id === id); return c ? <span key={id} title={c.name}>{c.icon}</span> : null; })}
+                <span className="flex gap-0.5">
+                  {char.conditions.map((id) => { const c = db.conditions.find((x) => x.id === id); return c ? <PixelIcon key={id} name={`cond_${c.id}`} size={14} title={c.name} /> : null; })}
                 </span>
               </h2>
-              <p className="font-vt text-base text-bronze">{raceOf(char, db)?.name} {classOf(char, db)?.name} · Nivel {char.level}</p>
+              <p className="truncate font-vt text-body-sm text-bronze">
+                {raceOf(char, db)?.name} · {classOf(char, db)?.name}
+                {subclassOf(char, db) ? ` (${subclassOf(char, db).name})` : ''} · {backgroundOf(char, db)?.name} · Nv {char.level}
+              </p>
             </div>
-            <div className="flex gap-2 text-center font-press text-[8px]">
-              <div className="rounded border border-bronze/50 bg-parchmentDark/50 px-2 py-1"><div className="text-bronze">CA</div><div className="text-sm text-sky">{ac}</div></div>
-              <div className="rounded border border-bronze/50 bg-parchmentDark/50 px-2 py-1"><div className="text-bronze">PV</div><div className="text-sm text-blood">{char.hp.current}/{char.hp.max}</div></div>
+            <span className="shrink-0 rounded border border-bronze/50 bg-parchmentDark/60 px-2 py-0.5 font-press text-hud-xs text-bronze">
+              d{classOf(char, db)?.hitDie} · {raceOf(char, db)?.speed}m
+            </span>
+          </div>
+
+          {/* NIVEL 1 — INSTRUMENTOS (derivado / vivo). Fuera del scroll. */}
+          <div className="relative border-b-2 border-gold bg-parchmentDark/55 px-3 py-2">
+            <span className="absolute right-3 top-1 flex items-center gap-1 font-vt text-[12px] text-bronze/70">
+              <span className="animate-softpulse">⟳</span> se recalcula solo
+            </span>
+            <div className="mb-1 font-press text-hud-xs uppercase tracking-wider text-bronze/80">Instrumentos</div>
+            <div className="grid grid-cols-4 gap-2">
+              <Inst label="PV" value={char.hp.current} sub={`/ ${char.hp.max}`} color="text-blood" />
+              <Inst label="CA" value={ac} color="text-sky" />
+              <Inst label="INIC." value={fmtMod(abilityMod(char.abilities.DES))} color="text-ink" />
+              <Inst label="COMP." value={fmtMod(proficiencyBonus(char.level))} color="text-gold" />
             </div>
           </div>
 
-          <div ref={scrollRef} onScroll={updateEdges} className="h-[calc(100%-3.5rem)] overflow-y-auto px-4 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div ref={scrollRef} onScroll={updateEdges} className="h-[calc(100%-7.6rem)] overflow-y-auto px-4 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {tab === 0 && <StatsTab char={char} db={db} />}
             {tab === 1 && <InventoryTab charId={charId} char={char} db={db} />}
             {tab === 2 && (char.spells ? <SpellTracker charId={charId} /> : <EmptyState text="Esta clase no lanza conjuros." />)}
@@ -250,8 +275,11 @@ function SheetViewer({ charId, onBack, onLevelUp }) {
             <div className="h-2" />
           </div>
 
-          {tab === 0 && !edges.top && <div className="pointer-events-none absolute right-2 top-14 animate-blink font-press text-[10px] text-blood">▲</div>}
-          {tab === 0 && !edges.bottom && <div className="pointer-events-none absolute bottom-1 right-2 animate-blink font-press text-[10px] text-blood">▼</div>}
+          {/* Afordancia de scroll: riel + thumb derivado + fade (sin flechas) */}
+          <div className="pointer-events-none absolute right-1.5 bottom-3 top-[7.6rem] w-[3px] rounded bg-bronze/25">
+            <div className="absolute left-0 w-[3px] rounded bg-gold/80" style={{ height: `${railH}%`, top: `${railTop}%` }} />
+          </div>
+          {!edges.bottom && <div className="parchment-fade pointer-events-none absolute inset-x-0 bottom-0 h-7" />}
         </div>
       </div>
     </Frame>
@@ -267,90 +295,64 @@ function EmptyState({ text }) {
   );
 }
 
+// Tile de la franja Instrumentos (dato derivado/vivo en su color de acento).
+function Inst({ label, value, sub, color }) {
+  return (
+    <div className="flex flex-col items-center justify-center rounded border border-bronze/40 bg-parchment px-1 py-1.5 shadow-[inset_0_-2px_0_rgba(0,0,0,.07)]">
+      <span className="font-press text-[8px] leading-none text-bronze">{label}</span>
+      <span className={`mt-1 font-press text-[17px] leading-none ${color}`}>{value}</span>
+      <span className="font-vt text-[13px] leading-none text-bronze/70">{sub || ' '}</span>
+    </div>
+  );
+}
+
 /* ----- Pestaña Stats (derivada) ------------------------------------- */
 function Section({ label, children }) {
   return (
     <section className="mb-3">
-      <h3 className="mb-1 border-b-2 border-gold font-press text-[9px] uppercase tracking-wide text-bronze">{label}</h3>
+      <h3 className="mb-1 border-b-2 border-gold font-press text-hud-sm uppercase tracking-wide text-bronze">{label}</h3>
       {children}
     </section>
   );
 }
 
 function StatsTab({ char, db }) {
-  const race = raceOf(char, db);
-  const cls = classOf(char, db);
-  const bg = backgroundOf(char, db);
   const { saves, skills } = deriveProficiencies(char, db);
   const traits = deriveTraits(char, db);
-  const dexMod = abilityMod(char.abilities.DES);
-
-  const sub = subclassOf(char, db);
-  const meta = [
-    ['Especie', race?.name],
-    ['Clase', cls?.name],
-    sub && ['Subclase', sub.name],
-    ['Trasfondo', bg?.name],
-    ['Nivel', String(char.level)],
-    ['Idiomas', deriveLanguages(char, db).join(', ')],
-  ].filter(Boolean);
-  const vitals = [
-    ['Puntos de Vida', `${char.hp.current}/${char.hp.max}${char.hp.temp ? ` (+${char.hp.temp})` : ''}`, 'blood'],
-    ['Clase de Armadura', String(deriveAC(char, db)), 'sky'],
-    ['Iniciativa', fmtMod(dexMod), 'parchment'],
-    ['Bono Comp.', fmtMod(proficiencyBonus(char.level)), 'gold'],
-    ['Velocidad', `${race?.speed} m`, 'parchment'],
-    ['Dado de Golpe', `d${cls?.hitDie}`, 'gold'],
-  ];
 
   return (
     <>
-      <Section label="Información">
-        <dl className="grid grid-cols-2 gap-x-4 gap-y-1 font-vt text-lg">
-          {meta.map(([k, v]) => (
-            <div key={k} className="flex justify-between border-b border-bronze/30"><dt className="text-bronze">{k}</dt><dd className="font-semibold">{v}</dd></div>
-          ))}
-        </dl>
-      </Section>
-
-      <Section label="Vitales (derivados)">
-        <div className="grid grid-cols-2 gap-2">
-          {vitals.map(([k, v, accent]) => (
-            <div key={k} className="flex items-center justify-between rounded border border-bronze/50 bg-parchmentDark/40 px-2 py-1">
-              <span className="font-vt text-base text-bronze">{k}</span>
-              <span className={`font-press text-[11px] ${ACCENT[accent] || 'text-ink'}`}>{v}</span>
+      {/* NÚCLEO — el modificador es protagonista; neutral ink. */}
+      <div className="mb-1 font-press text-hud-xs uppercase tracking-wider text-bronze/80">Núcleo · Características</div>
+      <div className="mb-3 grid grid-cols-3 gap-1.5">
+        {STAT_KEYS.map((k) => {
+          const v = char.abilities[k];
+          return (
+            <div key={k} className="flex items-center justify-between rounded border-2 border-bronze/50 bg-parchment px-2 py-1">
+              <span className="flex flex-col leading-none">
+                <span className="font-press text-hud-xs text-bronze">{k}</span>
+                <span className="mt-0.5 font-vt text-[14px] text-ink/55">{v}</span>
+              </span>
+              <span className="font-press text-[16px] text-ink">{fmtMod(abilityMod(v))}</span>
             </div>
-          ))}
-        </div>
-      </Section>
+          );
+        })}
+      </div>
 
-      <Section label="Características">
-        <div className="grid grid-cols-3 gap-2">
-          {STAT_KEYS.map((k) => {
-            const v = char.abilities[k];
-            return (
-              <div key={k} className="flex items-center justify-between rounded border-2 border-bronze/60 bg-parchmentDark/40 px-2 py-1">
-                <span className="font-press text-[8px] text-bronze">{k}</span>
-                <span className="font-press text-sm text-ink">{v}</span>
-                <span className="font-vt text-base text-moss">{fmtMod(abilityMod(v))}</span>
-              </div>
-            );
-          })}
-        </div>
-      </Section>
-
-      <Section label="Competencias (heredadas)">
-        <p className="font-vt text-lg"><span className="text-bronze">Salvaciones: </span>{saves.map((s) => STAT_NAMES[s]).join(', ') || '—'}</p>
-        <p className="font-vt text-lg"><span className="text-bronze">Habilidades: </span>{skills.join(', ') || '—'}</p>
-      </Section>
-
-      <Section label="Rasgos (heredados)">
-        <ul className="flex flex-col gap-1 font-vt text-base leading-snug">
+      {/* REFERENCIA — atenuado, compacto, al fondo del scroll. */}
+      <div className="rounded border border-bronze/30 bg-parchment/40 px-2 py-1.5">
+        <div className="mb-1 font-press text-hud-xs uppercase tracking-wider text-bronze/60">Referencia</div>
+        <p className="font-vt text-body-sm leading-snug text-ink/75"><span className="text-bronze">Idiomas:</span> {deriveLanguages(char, db).join(', ')}</p>
+        <p className="font-vt text-body-sm leading-snug text-ink/75"><span className="text-bronze">Salvaciones:</span> {saves.map((s) => STAT_NAMES[s]).join(', ') || '—'}</p>
+        <p className="font-vt text-body-sm leading-snug text-ink/75"><span className="text-bronze">Habilidades:</span> {skills.join(', ') || '—'}</p>
+        <div className="mt-1 border-t border-bronze/25 pt-1">
           {traits.map((t) => (
-            <li key={t.source + t.name}><span className="font-semibold text-arcane">{t.name}</span> <span className="text-bronze">({t.source})</span> — {t.desc}</li>
+            <p key={t.source + t.name} className="font-vt text-body-sm leading-snug text-ink/75">
+              <span className="font-semibold text-arcane">{t.name}</span> <span className="text-bronze">({t.source})</span> — {t.desc}
+            </p>
           ))}
-        </ul>
-      </Section>
+        </div>
+      </div>
     </>
   );
 }
@@ -394,7 +396,7 @@ function InventoryTab({ charId, char, db }) {
               <span className={can ? (slot.equipped ? 'text-moss' : 'text-bronze/50') : 'text-transparent'}>{slot.equipped ? '☑' : '☐'}</span>
               <span className="flex-1">{item?.name}</span>
               <span className="text-bronze">{item?.note}</span>
-              {slot.equipped && <span className="font-press text-[7px] text-moss">EQUIP.</span>}
+              {slot.equipped && <span className="font-vt text-sm text-moss">EQUIP.</span>}
             </li>
           );
         })}
