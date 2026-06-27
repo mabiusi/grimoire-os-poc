@@ -60,18 +60,38 @@ export default function LevelUpWizard({ char, targetLevel, onComplete, onCancel 
       />
     );
   }
+  if (step.kind === 'cantrips') {
+    const known = new Set(working.spells?.knownIds || []);
+    const items = db.spells
+      .filter((s) => s.level === 0 && !known.has(s.id))
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((s) => ({ id: s.id, name: s.name, note: `Truco · ${s.school}` }));
+    const count = step.seed ? 3 : 1;
+    return (
+      <ChecklistSelect
+        key={stepIndex}
+        title={step.seed ? 'TRUCOS INICIALES' : 'SUBIR · TRUCO NUEVO'}
+        icon="spell"
+        prompt={`APRENDE HASTA ${count}`}
+        items={items}
+        max={count}
+        onConfirm={(ids) => advance(learnSpells(working, ids))}
+        onBack={onCancel}
+      />
+    );
+  }
   if (step.kind === 'spells') {
     const maxLvl = maxCastableLevel(cls, step.level);
     const known = new Set(working.spells?.knownIds || []);
     const items = db.spells
-      .filter((s) => s.level <= maxLvl && !known.has(s.id))
+      .filter((s) => s.level >= 1 && s.level <= maxLvl && !known.has(s.id))
       .sort((a, b) => a.level - b.level || a.name.localeCompare(b.name))
-      .map((s) => ({ id: s.id, name: s.name, note: s.level === 0 ? 'Truco' : `Nv ${s.level} · ${s.school}` }));
+      .map((s) => ({ id: s.id, name: s.name, note: `Nv ${s.level} · ${s.school}` }));
     const count = step.seed ? 4 : 2;
     return (
       <ChecklistSelect
         key={stepIndex}
-        title={step.seed ? `CONJUROS INICIALES (Nv ${step.level})` : `SUBIR · CONJUROS (Nv ${step.level})`}
+        title={step.seed ? `CONJUROS INICIALES (hasta Nv ${maxLvl})` : `SUBIR · CONJUROS (hasta Nv ${maxLvl})`}
         icon="spell"
         prompt={`APRENDE HASTA ${count}`}
         items={items}
