@@ -1,9 +1,12 @@
 // Lógica central de progresión / subida de nivel (pura). El LevelUpWizard la
 // usa para construir el "plan" de pasos y aplicar cada elección al personaje.
 import { hitDieAverage } from '../data/constants.js';
-import { abilityMod, spellSlotsForLevel } from './derive.js';
+import { abilityMod, spellSlotsForLevel, maxCastableLevel } from './derive.js';
 
 export { hitDieAverage };
+
+// Niveles donde un lanzador aprende un truco nuevo (5e: la mayoría a 4 y 10).
+export const CANTRIP_LEVELS = [4, 10];
 
 /**
  * Construye el plan de pasos para subir de `char.level` a `targetLevel`.
@@ -16,12 +19,30 @@ export { hitDieAverage };
 export function planLevelUp(char, targetLevel, cls) {
   const steps = [];
   if (!cls) return steps;
+  const isCaster = !!(cls.spellcasting && char.spells);
+  // Semilla: lanzador recién creado (aún sin conjuros) elige su repertorio inicial.
+  // Trucos y conjuros van en pasos SEPARADOS (cada uno con solo lo suyo).
+  if (isCaster && (char.spells.knownIds?.length || 0) === 0) {
+    steps.push({ level: char.level, kind: 'cantrips', seed: true });
+    if (maxCastableLevel(cls, char.level) >= 1) steps.push({ level: char.level, kind: 'spells', seed: true });
+  }
   for (let lvl = char.level + 1; lvl <= targetLevel; lvl += 1) {
     steps.push({ level: lvl, kind: 'hp', hitDie: cls.hitDie });
     if (cls.subclassLevel === lvl && !char.subclassId) steps.push({ level: lvl, kind: 'subclass' });
     if ((cls.asiLevels || []).includes(lvl)) steps.push({ level: lvl, kind: 'asi' });
+    if (isCaster) {
+      if (CANTRIP_LEVELS.includes(lvl)) steps.push({ level: lvl, kind: 'cantrips' }); // truco nuevo
+      if (maxCastableLevel(cls, lvl) >= 1) steps.push({ level: lvl, kind: 'spells' }); // conjuros nuevos
+    }
   }
   return steps;
+}
+
+// Suma conjuros/trucos elegidos al repertorio conocido (sin duplicar).
+export function learnSpells(char, ids) {
+  if (!char.spells) return char;
+  const knownIds = [...new Set([...char.spells.knownIds, ...(ids || [])])];
+  return { ...char, spells: { ...char.spells, knownIds } };
 }
 
 // Suma PV al máximo (y al actual): tirada o promedio, + modificador de CON.

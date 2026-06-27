@@ -4,6 +4,8 @@ import Cursor from '../components/Cursor.jsx';
 import PixelIcon from '../components/PixelIcon.jsx';
 import Tabs from '../components/Tabs.jsx';
 import SpellTracker from '../components/SpellTracker.jsx';
+import SpellDetail from '../components/SpellDetail.jsx';
+import SpellLearnPicker from '../components/SpellLearnPicker.jsx';
 import CombatTracker from '../components/CombatTracker.jsx';
 import LevelUpWizard from '../components/LevelUpWizard.jsx';
 import CharacterCreator from './CharacterCreator.jsx';
@@ -46,7 +48,9 @@ export default function CharacterSheets() {
       <CharacterCreator
         onCancel={() => setPhase('roster')}
         onComplete={(char, level) => {
-          if (level > 1) {
+          // Nivel >1 o lanzador de nivel 1 (debe elegir su repertorio inicial)
+          // pasan por el asistente; el resto se guarda directo.
+          if (level > 1 || char.spells) {
             setLevelUp({ char, target: level, isNew: true });
             setPhase('levelup');
           } else {
@@ -188,6 +192,8 @@ function SheetViewer({ charId, onBack, onLevelUp }) {
   const scrollRef = useRef(null);
   const [tab, setTab] = useState(0);
   const [edges, setEdges] = useState({ top: true, bottom: false, scrollTop: 0, scrollH: 1, clientH: 1 });
+  const [inspect, setInspect] = useState(null); // conjuro en detalle (pop-up de Magia)
+  const [learnOpen, setLearnOpen] = useState(false); // explorador "Aprender conjuro"
 
   const updateEdges = () => {
     const el = scrollRef.current;
@@ -264,7 +270,7 @@ function SheetViewer({ charId, onBack, onLevelUp }) {
           <div ref={scrollRef} onScroll={updateEdges} className="h-[calc(100%-7.6rem)] overflow-y-auto px-4 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {tab === 0 && <StatsTab char={char} db={db} />}
             {tab === 1 && <InventoryTab charId={charId} char={char} db={db} />}
-            {tab === 2 && (char.spells ? <SpellTracker charId={charId} /> : <EmptyState title="SIN CONJUROS" text="Esta clase no canaliza magia arcana ni divina." />)}
+            {tab === 2 && (char.spells ? <SpellTracker charId={charId} onInspect={setInspect} onLearn={() => setLearnOpen(true)} /> : <EmptyState title="SIN CONJUROS" text="Esta clase no canaliza magia arcana ni divina." />)}
             {tab === 3 && <CombatTracker charId={charId} />}
             <div className="h-2" />
           </div>
@@ -277,6 +283,12 @@ function SheetViewer({ charId, onBack, onLevelUp }) {
               interactivas tapaba la fila activa del fondo (artefacto de "línea")
               y el riel ya indica la posición de scroll. */}
           {tab === 0 && !edges.bottom && <div className="parchment-fade pointer-events-none absolute inset-x-0 bottom-0 h-7" />}
+
+          {/* Pop-up de detalle de conjuro/truco (capa modal sobre el panel) */}
+          {inspect && <SpellDetail charId={charId} spell={inspect} onClose={() => setInspect(null)} />}
+
+          {/* Explorador para aprender cualquier conjuro (capa modal sobre el panel) */}
+          {learnOpen && <SpellLearnPicker charId={charId} onClose={() => setLearnOpen(false)} />}
         </div>
       </div>
     </Frame>
@@ -346,8 +358,8 @@ function StatsTab({ char, db }) {
         <p className="font-vt text-body-sm leading-snug text-ink/75"><span className="text-bronze">Salvaciones:</span> {saves.map((s) => STAT_NAMES[s]).join(', ') || '—'}</p>
         <p className="font-vt text-body-sm leading-snug text-ink/75"><span className="text-bronze">Habilidades:</span> {skills.join(', ') || '—'}</p>
         <div className="mt-1 border-t border-bronze/25 pt-1">
-          {traits.map((t) => (
-            <p key={t.source + t.name} className="font-vt text-body-sm leading-snug text-ink/75">
+          {traits.map((t, i) => (
+            <p key={`${t.source}-${t.name}-${i}`} className="font-vt text-body-sm leading-snug text-ink/75">
               <span className="font-semibold text-arcane">{t.name}</span> <span className="text-bronze">({t.source})</span> — {t.desc}
             </p>
           ))}

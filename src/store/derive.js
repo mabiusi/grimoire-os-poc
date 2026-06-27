@@ -79,14 +79,26 @@ export function spellSlotsForLevel(cls, level) {
   return slots;
 }
 
+// Nivel de conjuro MÁS ALTO que el personaje puede lanzar a `level` (por sus
+// espacios). 0 = sólo trucos. Define el pool aprendible al subir de nivel.
+export function maxCastableLevel(cls, level) {
+  const slots = spellSlotsForLevel(cls, level);
+  let max = 0;
+  if (slots) for (const k in slots) if (slots[k].total > 0) max = Math.max(max, Number(k));
+  return max;
+}
+
 // Construye el MODELO DE DATOS de un personaje de NIVEL 1 desde las elecciones.
 // (Si el nivel inicial elegido es > 1, el LevelUpWizard sube desde aquí.)
 export function buildCharacterFromChoices({ name, raceId, classId, backgroundId, abilities, languages, equipment }, db) {
   const cls = db.classes.find((c) => c.id === classId);
   const max = Math.max(1, (cls?.hitDie || 8) + abilityMod(abilities.CON));
   const slots = spellSlotsForLevel(cls, 1);
+  // Lanzador recién creado: arranca SIN conjuros; el asistente (paso "Conjuros",
+  // semilla) le hace elegir los iniciales. (Los datos no asocian conjuro→clase,
+  // así que el pool se filtra por nivel de conjuro, no por clase.)
   const spells = cls?.spellcasting
-    ? { knownIds: db.spells.filter((s) => s.classes?.includes(classId)).map((s) => s.id), preparedIds: [], slots: slots || {} }
+    ? { knownIds: [], preparedIds: [], slots: slots || {} }
     : null;
 
   return {
