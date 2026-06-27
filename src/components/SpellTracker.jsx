@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Cursor from './Cursor.jsx';
+import PixelIcon from './PixelIcon.jsx';
 import { useGrimoireStore } from '../store/useGrimoireStore.js';
 import { useGamepad } from '../hooks/useGamepad.js';
 import { sfx } from '../lib/sfx.js';
@@ -9,14 +10,15 @@ import { spellOf } from '../store/derive.js';
 
 /**
  * Módulo 4 — Pestaña de Magia (conectada al store).
- *   ↑↓ -> navegar trucos / conjuros / filas de espacios
+ *   ↑↓ -> navegar fila "Aprender" / trucos / conjuros / filas de espacios
  *   ←→ -> elegir burbuja dentro de un nivel de espacios
- *   A  -> conjuro: PREPARAR/quitar · burbuja: GASTADO/disponible
+ *   A  -> fila Aprender: abrir explorador · truco/conjuro: ver detalle ·
+ *         burbuja: GASTADO/disponible
  *
  * Persiste en el personaje del store (preparedIds, slots.used). El visor
  * conserva L/R (pestañas) y B; este componente gana ↑↓←→/A por recencia.
  */
-export default function SpellTracker({ charId, onInspect }) {
+export default function SpellTracker({ charId, onInspect, onLearn }) {
   const char = useGrimoireStore((s) => s.characters.find((c) => c.id === charId));
   const db = useGrimoireStore((s) => s.db);
   const { setSpellSlotUsed } = useGrimoireStore.getState();
@@ -24,7 +26,7 @@ export default function SpellTracker({ charId, onInspect }) {
 
   const rows = useMemo(() => {
     if (!magic) return [];
-    const out = [];
+    const out = [{ type: 'learn' }]; // acción: aprender cualquier conjuro
     const known = magic.knownIds.map((id) => spellOf(id, db)).filter(Boolean);
     const cantrips = known.filter((s) => s.level === 0);
     if (cantrips.length) {
@@ -65,7 +67,10 @@ export default function SpellTracker({ charId, onInspect }) {
 
   const act = () => {
     if (!activeRow) return;
-    if (activeRow.type === 'slots') {
+    if (activeRow.type === 'learn') {
+      sfx.open();
+      onLearn?.();
+    } else if (activeRow.type === 'slots') {
       const used = magic.slots[activeRow.level].used;
       setSpellSlotUsed(charId, activeRow.level, bubble < used ? bubble : bubble + 1);
       sfx[bubble < used ? 'tick' : 'back']();
@@ -82,6 +87,19 @@ export default function SpellTracker({ charId, onInspect }) {
     <div className="font-vt text-ink">
       {rows.map((row, ri) => {
         const active = ri === activeRowIndex;
+        if (row.type === 'learn') {
+          return (
+            <div
+              key="learn"
+              ref={active ? activeRef : null}
+              className={['mb-2 flex items-center gap-2 rounded border-2 border-dashed px-2 py-1 text-lg', active ? focusRow(true) : 'border-moss/60 text-moss'].join(' ')}
+            >
+              <Cursor visible={active} className={active ? 'text-[#2a1c0c]' : ''} />
+              <PixelIcon name="plus" size={16} engrave={active} />
+              <span className="font-press text-hud-sm">Aprender conjuro</span>
+            </div>
+          );
+        }
         if (row.type === 'header') {
           return <h3 key={ri} className="mb-1 mt-3 border-b-2 border-gold font-press text-[9px] uppercase tracking-wide text-bronze first:mt-0">{row.label}</h3>;
         }

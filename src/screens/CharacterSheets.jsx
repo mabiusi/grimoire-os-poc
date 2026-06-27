@@ -5,6 +5,7 @@ import PixelIcon from '../components/PixelIcon.jsx';
 import Tabs from '../components/Tabs.jsx';
 import SpellTracker from '../components/SpellTracker.jsx';
 import SpellDetail from '../components/SpellDetail.jsx';
+import SpellLearnPicker from '../components/SpellLearnPicker.jsx';
 import CombatTracker from '../components/CombatTracker.jsx';
 import LevelUpWizard from '../components/LevelUpWizard.jsx';
 import CharacterCreator from './CharacterCreator.jsx';
@@ -192,6 +193,7 @@ function SheetViewer({ charId, onBack, onLevelUp }) {
   const [tab, setTab] = useState(0);
   const [edges, setEdges] = useState({ top: true, bottom: false, scrollTop: 0, scrollH: 1, clientH: 1 });
   const [inspect, setInspect] = useState(null); // conjuro en detalle (pop-up de Magia)
+  const [learnOpen, setLearnOpen] = useState(false); // explorador "Aprender conjuro"
 
   const updateEdges = () => {
     const el = scrollRef.current;
@@ -268,7 +270,7 @@ function SheetViewer({ charId, onBack, onLevelUp }) {
           <div ref={scrollRef} onScroll={updateEdges} className="h-[calc(100%-7.6rem)] overflow-y-auto px-4 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {tab === 0 && <StatsTab char={char} db={db} />}
             {tab === 1 && <InventoryTab charId={charId} char={char} db={db} />}
-            {tab === 2 && (char.spells ? <SpellTracker charId={charId} onInspect={setInspect} /> : <EmptyState title="SIN CONJUROS" text="Esta clase no canaliza magia arcana ni divina." />)}
+            {tab === 2 && (char.spells ? <SpellTracker charId={charId} onInspect={setInspect} onLearn={() => setLearnOpen(true)} /> : <EmptyState title="SIN CONJUROS" text="Esta clase no canaliza magia arcana ni divina." />)}
             {tab === 3 && <CombatTracker charId={charId} />}
             <div className="h-2" />
           </div>
@@ -284,6 +286,9 @@ function SheetViewer({ charId, onBack, onLevelUp }) {
 
           {/* Pop-up de detalle de conjuro/truco (capa modal sobre el panel) */}
           {inspect && <SpellDetail charId={charId} spell={inspect} onClose={() => setInspect(null)} />}
+
+          {/* Explorador para aprender cualquier conjuro (capa modal sobre el panel) */}
+          {learnOpen && <SpellLearnPicker charId={charId} onClose={() => setLearnOpen(false)} />}
         </div>
       </div>
     </Frame>

@@ -148,6 +148,17 @@ export const useGrimoireStore = create((set, get) => ({
       conditions: c.conditions.includes(condId) ? c.conditions.filter((x) => x !== condId) : [...c.conditions, condId],
     })),
 
+  // --- magia: aprender / olvidar cualquier conjuro (fuera de la subida de nivel:
+  //     pergaminos, premios, etc.). Al olvidar, también lo quita de preparados. ---
+  toggleSpellKnown: (id, spellId) =>
+    get().updateCharacter(id, (c) => {
+      if (!c.spells) return c;
+      const has = c.spells.knownIds.includes(spellId);
+      const knownIds = has ? c.spells.knownIds.filter((x) => x !== spellId) : [...c.spells.knownIds, spellId];
+      const preparedIds = has ? c.spells.preparedIds.filter((x) => x !== spellId) : c.spells.preparedIds;
+      return { ...c, spells: { ...c.spells, knownIds, preparedIds } };
+    }),
+
   // --- magia: preparar / gastar espacios ---
   toggleSpellPrepared: (id, spellId) =>
     get().updateCharacter(id, (c) => {
