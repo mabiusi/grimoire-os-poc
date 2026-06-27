@@ -16,10 +16,10 @@ import { spellOf } from '../store/derive.js';
  * Persiste en el personaje del store (preparedIds, slots.used). El visor
  * conserva L/R (pestañas) y B; este componente gana ↑↓←→/A por recencia.
  */
-export default function SpellTracker({ charId }) {
+export default function SpellTracker({ charId, onInspect }) {
   const char = useGrimoireStore((s) => s.characters.find((c) => c.id === charId));
   const db = useGrimoireStore((s) => s.db);
-  const { toggleSpellPrepared, setSpellSlotUsed } = useGrimoireStore.getState();
+  const { setSpellSlotUsed } = useGrimoireStore.getState();
   const magic = char?.spells;
 
   const rows = useMemo(() => {
@@ -65,15 +65,14 @@ export default function SpellTracker({ charId }) {
 
   const act = () => {
     if (!activeRow) return;
-    if (activeRow.type === 'spell') {
-      toggleSpellPrepared(charId, activeRow.id);
-      sfx.tick();
-    } else if (activeRow.type === 'slots') {
+    if (activeRow.type === 'slots') {
       const used = magic.slots[activeRow.level].used;
       setSpellSlotUsed(charId, activeRow.level, bubble < used ? bubble : bubble + 1);
       sfx[bubble < used ? 'tick' : 'back']();
     } else {
-      sfx.tick(); // truco: siempre conocido
+      // truco o conjuro -> abrir el detalle (allí se prepara/quita)
+      const sp = spellOf(activeRow.id, db);
+      if (sp) { sfx.open(); onInspect?.(sp); }
     }
   };
 
@@ -127,7 +126,7 @@ export default function SpellTracker({ charId }) {
         );
       })}
       <p className="mt-3 border-t border-bronze/30 pt-2 font-vt text-base text-bronze">
-        <kbd className="rounded-sm bg-gold px-1 text-[#2a1c0c]">A</kbd> prepara / gasta espacios · <kbd className="rounded-sm bg-gold px-1 text-[#2a1c0c]">←→</kbd> elige burbuja
+        <kbd className="rounded-sm bg-gold px-1 text-[#2a1c0c]">A</kbd> ver detalle · gastar espacio · <kbd className="rounded-sm bg-gold px-1 text-[#2a1c0c]">←→</kbd> elige burbuja
       </p>
     </div>
   );

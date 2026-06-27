@@ -16,12 +16,25 @@ export { hitDieAverage };
 export function planLevelUp(char, targetLevel, cls) {
   const steps = [];
   if (!cls) return steps;
+  const isCaster = !!(cls.spellcasting && char.spells);
+  // Semilla: lanzador recién creado (aún sin conjuros) elige su repertorio inicial.
+  if (isCaster && (char.spells.knownIds?.length || 0) === 0) {
+    steps.push({ level: char.level, kind: 'spells', seed: true });
+  }
   for (let lvl = char.level + 1; lvl <= targetLevel; lvl += 1) {
     steps.push({ level: lvl, kind: 'hp', hitDie: cls.hitDie });
     if (cls.subclassLevel === lvl && !char.subclassId) steps.push({ level: lvl, kind: 'subclass' });
     if ((cls.asiLevels || []).includes(lvl)) steps.push({ level: lvl, kind: 'asi' });
+    if (isCaster) steps.push({ level: lvl, kind: 'spells' }); // aprende conjuros nuevos
   }
   return steps;
+}
+
+// Suma conjuros/trucos elegidos al repertorio conocido (sin duplicar).
+export function learnSpells(char, ids) {
+  if (!char.spells) return char;
+  const knownIds = [...new Set([...char.spells.knownIds, ...(ids || [])])];
+  return { ...char, spells: { ...char.spells, knownIds } };
 }
 
 // Suma PV al máximo (y al actual): tirada o promedio, + modificador de CON.

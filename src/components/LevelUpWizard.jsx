@@ -3,14 +3,15 @@ import Frame from './Frame.jsx';
 import Cursor from './Cursor.jsx';
 import PixelIcon from './PixelIcon.jsx';
 import ListSelect from './ListSelect.jsx';
+import ChecklistSelect from './ChecklistSelect.jsx';
 import { useGrimoireStore } from '../store/useGrimoireStore.js';
 import { useSystem } from '../context/SystemContext.jsx';
 import { useGamepad } from '../hooks/useGamepad.js';
 import { sfx } from '../lib/sfx.js';
 import { rollDie, wrapIndex, isReducedMotion } from '../lib/utils.js';
 import { STAT_KEYS, STAT_NAMES } from '../data/constants.js';
-import { abilityMod, fmtMod, classOf } from '../store/derive.js';
-import { planLevelUp, gainHp, setSubclass, applyAsi, finalizeLevel, hitDieAverage } from '../store/levelup.js';
+import { abilityMod, fmtMod, classOf, maxCastableLevel } from '../store/derive.js';
+import { planLevelUp, gainHp, setSubclass, applyAsi, finalizeLevel, hitDieAverage, learnSpells } from '../store/levelup.js';
 
 /**
  * Asistente de subida de nivel. Recorre el `plan` (planLevelUp) y aplica cada
@@ -55,6 +56,27 @@ export default function LevelUpWizard({ char, targetLevel, onComplete, onCancel 
         prompt="ELIGE TU SUBCLASE"
         items={items}
         onConfirm={(id) => advance(setSubclass(working, id))}
+        onBack={onCancel}
+      />
+    );
+  }
+  if (step.kind === 'spells') {
+    const maxLvl = maxCastableLevel(cls, step.level);
+    const known = new Set(working.spells?.knownIds || []);
+    const items = db.spells
+      .filter((s) => s.level <= maxLvl && !known.has(s.id))
+      .sort((a, b) => a.level - b.level || a.name.localeCompare(b.name))
+      .map((s) => ({ id: s.id, name: s.name, note: s.level === 0 ? 'Truco' : `Nv ${s.level} · ${s.school}` }));
+    const count = step.seed ? 4 : 2;
+    return (
+      <ChecklistSelect
+        key={stepIndex}
+        title={step.seed ? `CONJUROS INICIALES (Nv ${step.level})` : `SUBIR · CONJUROS (Nv ${step.level})`}
+        icon="spell"
+        prompt={`APRENDE HASTA ${count}`}
+        items={items}
+        max={count}
+        onConfirm={(ids) => advance(learnSpells(working, ids))}
         onBack={onCancel}
       />
     );
